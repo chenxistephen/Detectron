@@ -37,6 +37,72 @@ _RAW_DIR = 'raw_dir'
 
 # Available datasets
 _DATASETS = {
+    'HF_Fashion_VI_train': {
+        _IM_DIR:
+            _DATA_DIR + '/',
+        _ANN_FN:
+            _DATA_DIR + '/HF_Fashion_VI/json_annotations/HFAll_Fashion_VI_annotations_train.json'
+    },
+    'fashion_seg_train': {
+        _IM_DIR:
+            _DATA_DIR + '/FashionSegmentation/Images',
+        _ANN_FN:
+            _DATA_DIR + '/FashionSegmentation/json_annotations/train_annotations.json'
+    },   
+    'fashion_seg_val': {
+        _IM_DIR:
+            _DATA_DIR + '/FashionSegmentation/Images',
+        _ANN_FN:
+            _DATA_DIR + '/FashionSegmentation/json_annotations/val_annotations.json'
+    },       
+    'logo_1048_train': {
+        _IM_DIR:
+            _DATA_DIR + '/Logo/Images',
+        _ANN_FN:
+            _DATA_DIR + '/Logo/json_annotations/train_annotations.json'
+    },
+    'logo_1048_test': {
+        _IM_DIR:
+            _DATA_DIR + '/Logo/Images',
+        _ANN_FN:
+            _DATA_DIR + '/Logo/json_annotations/test_annotations.json'
+    },
+    'furniture_train': {
+        _IM_DIR:
+            _DATA_DIR + '/HomeFurniture/Images',
+        _ANN_FN:
+            _DATA_DIR + '/HomeFurniture/json_annotations/train_annotations.json'
+    },
+    'furniture_val': {
+        _IM_DIR:
+            _DATA_DIR + '/HomeFurniture/Images',
+        _ANN_FN:
+            _DATA_DIR + '/HomeFurniture/json_annotations/val_annotations.json'
+    },
+    'furniture_thumbnail_val_SearchIntent': {
+        _IM_DIR:
+            _DATA_DIR + '/HomeFurniture/Thumbnails',
+        _ANN_FN:
+            _DATA_DIR + '/HomeFurniture/json_annotations/val_SearchIntent_thumbnail_annotations.json'
+    },
+    'furniture_val_SearchIntent': {
+        _IM_DIR:
+            _DATA_DIR + '/HomeFurniture/Images',
+        _ANN_FN:
+            _DATA_DIR + '/HomeFurniture/json_annotations/val_SearchIntent_annotations.json'
+    },
+    'bing5k_furniture': {
+        _IM_DIR:
+            _DATA_DIR + '/BingMeasurement_5k/Images',
+        _ANN_FN:
+            _DATA_DIR + '/BingMeasurement_5k/json_annotations/furniture_annotations.json'
+    },
+    'bing5k_furniture_thumbnail': {
+        _IM_DIR:
+            _DATA_DIR + '/BingMeasurement_5k/Thumbnails',
+        _ANN_FN:
+            _DATA_DIR + '/BingMeasurement_5k/json_annotations/furniture_thumbnail_annotations.json'
+    },
     'cityscapes_fine_instanceonly_seg_train': {
         _IM_DIR:
             _DATA_DIR + '/cityscapes/images',
