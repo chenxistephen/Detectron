@@ -35,17 +35,17 @@ import time
 
 from caffe2.python import workspace
 
-from core.config import assert_and_infer_cfg
-from core.config import cfg
-from core.config import merge_cfg_from_file
-from utils.io import cache_url
-from utils.timer import Timer
-import core.test_engine as infer_engine
-import datasets.dummy_datasets as dummy_datasets
-from datasets.json_dataset import JsonDataset
-import utils.c2 as c2_utils
-import utils.logging
-import utils.vis as vis_utils
+from detectron.core.config import assert_and_infer_cfg
+from detectron.core.config import cfg
+from detectron.core.config import merge_cfg_from_file
+from detectron.utils.io import cache_url
+from detectron.utils.timer import Timer
+import detectron.core.test_engine as infer_engine
+import detectron.datasets.dummy_datasets as dummy_datasets
+from detectron.datasets.json_dataset import JsonDataset
+import detectron.utils.c2 as c2_utils
+import detectron.utils.logging
+import detectron.utils.vis as vis_utils
 import os.path as osp
 c2_utils.import_detectron_ops()
 # OpenCL may be enabled by default in OpenCV3; disable it because it's not
@@ -85,6 +85,9 @@ def parse_args():
     )
     parser.add_argument(
         '--im_or_folder', dest='im_or_folder', help='image or folder of images', default=None
+    )
+    parser.add_argument(
+        '--im_list', dest='im_list', help='image list of images', default=None
     )
     parser.add_argument(
         '--cls_thrsh_file', dest='cls_thrsh_file', help='image or folder of images', default=None
@@ -153,7 +156,7 @@ def output_detbbox_one_image(
         bbox = boxes[i, :4]
         score = boxes[i, -1]
         cls_name = dataset.classes[classes[i]]
-        cls_thrsh = class_thresholds[cls_name]
+        cls_thrsh = class_thresholds[cls_name] if class_thresholds is not None else 0.7
         if score < thresh: #cls_thrsh:
             continue
 
@@ -188,11 +191,12 @@ def checkMkdir(dir):
         os.makedirs(dir)
 
 def main(args):
-    datasetName = 'furniture_val'
+    datasetName = 'logo_1048_test' #'furniture_val'
     logger = logging.getLogger(__name__)
     merge_cfg_from_file(args.cfg)
     cfg.NUM_GPUS = 1
     vis = True #False 
+    shuffleList = False
     args.weights = cache_url(args.weights, cfg.DOWNLOAD_CACHE)
     assert_and_infer_cfg(cache_urls=False)
     model = infer_engine.initialize_model_from_cfg(args.weights)
@@ -201,13 +205,26 @@ def main(args):
         print (class_thresholds)
     else:
         class_thresholds = None
-    dummy_coco_dataset = dummy_datasets.get_coco_dataset()
+    #dummy_coco_dataset = dummy_datasets.get_coco_dataset()
     dataset = JsonDataset(datasetName)
     print (args.im_or_folder)
-    if os.path.isdir(args.im_or_folder):
-        im_list = glob.iglob(args.im_or_folder + '/*.' + args.image_ext)
-    else:
-        im_list = [args.im_or_folder]
+    #if os.path.isdir(args.im_or_folder):
+    #    im_list = glob.iglob(args.im_or_folder + '/*.' + args.image_ext)
+    #else:
+    #    im_list = [args.im_or_folder]
+        
+    if osp.isdir(args.im_or_folder):
+        if args.im_list is None:
+            im_list = glob.glob(args.im_or_folder + '/*.' + args.image_ext)
+            im_list = [osp.basename(n) for n in im_list]
+        else:
+            im_list = [l.rstrip().split('\t')[0] + '.jpg' for l in open(args.im_list, 'r').readlines()]
+            im_list = [osp.join(args.im_or_folder, n) for n in im_list]
+            print (im_list[0])
+
+    if shuffleList:
+        from random import shuffle
+        shuffle(im_list)
     checkMkdir(args.output_dir)
     outTable = osp.join(args.output_dir, 'HF_CT_Measurement_Detected_Boxes.tsv')
     with open(outTable,'wb') as fout:
@@ -232,25 +249,44 @@ def main(args):
                     'rest (caches and auto-tuning need to warm up)'
                 )
             
+
+
+            outStrings = output_detbbox_one_image(
+                im[:, :, ::-1],
+                im_name,
+                args.output_dir,
+                cls_boxes,
+                cls_segms,
+                cls_keyps,
+                dataset=dataset, #dummy_coco_dataset,
+                box_alpha=0.3,
+                show_class=True,
+                class_thresholds=class_thresholds,
+                thresh=0.5,
+                kp_thresh=2
+            )
+            if outStrings is not None:
+                fout.write(outStrings)
             
             if vis:
-                vis_utils.vis_one_image(
+                vis_utils.vis_detbbox_one_image( #vis_one_image(
                     im[:, :, ::-1],  # BGR -> RGB for visualization
                     im_name,
                     args.output_dir,
                     cls_boxes,
                     cls_segms,
                     cls_keyps,
-                    dataset=dummy_coco_dataset,
+                    dataset=dataset, #dummy_coco_dataset,
                     box_alpha=0.3,
                     show_class=True,
-                    thresh=0.7,
+                    class_thresholds=class_thresholds,
+                    thresh=0.5,
                     kp_thresh=2
                 )
 
 
 if __name__ == '__main__':
     workspace.GlobalInit(['caffe2', '--caffe2_log_level=0'])
-    utils.logging.setup_logging(__name__)
+    detectron.utils.logging.setup_logging(__name__)
     args = parse_args()
     main(args)

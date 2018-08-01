@@ -87,6 +87,9 @@ def parse_args():
         '--im_or_folder', dest='im_or_folder', help='image or folder of images', default=None
     )
     parser.add_argument(
+        '--im_list', dest='im_list', help='image or folder of images', default=None
+    )
+    parser.add_argument(
         '--cls_thrsh_file', dest='cls_thrsh_file', help='image or folder of images', default=None
     )
     if len(sys.argv) == 1:
@@ -117,82 +120,18 @@ def convert_from_cls_format(cls_boxes, cls_segms, cls_keyps):
         classes += [j] * len(cls_boxes[j])
     return boxes, segms, keyps, classes
     
-def output_detbbox_one_image(
-        im, im_name, output_dir, boxes, segms=None, keypoints=None, class_thresholds=None, thresh=0.5, 
-        FilterPrecScore=True, FilterSize=True,
-        kp_thresh=2, dpi=200, box_alpha=0.0, dataset=None, show_class=True,
-        ext='tsv'):
-    """Visual debugging of detections."""
-    scoreTopK = 5
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    if isinstance(boxes, list):
-        boxes, segms, keypoints, classes = convert_from_cls_format(
-            boxes, segms, keypoints)
-
-    if boxes is None or boxes.shape[0] == 0 or max(boxes[:, 4]) < thresh:
-        return None
-
-    # Display in largest to smallest order to reduce occlusion
-    areas = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
-    out_scores = boxes[:,-1]
-
-    #sorted_inds = np.argsort(-areas)
-    sorted_inds = np.argsort(-out_scores)
-    height, width, channels = im.shape
-    size_ratio_thrsh = 0.15
-    mask_color_id = 0
-    urlPrefix = "http://cached.blob.core.windows.net/image-snapshots/"
-    imgName = osp.splitext(osp.basename(im_name))[0]
-    url = urlPrefix + imgName
-    print (url)
-    outStrings = ''
-    
-    for i in sorted_inds[:scoreTopK]:
-        bbox = boxes[i, :4]
-        score = boxes[i, -1]
-        cls_name = dataset.classes[classes[i]]
-        cls_thrsh = class_thresholds[cls_name]
-        if score < thresh: #cls_thrsh:
-            continue
-
-
-        if score < cls_thrsh:
-            if FilterPrecScore:
-                continue
-            ecolor = 'm'
-            tcolor = 'm' # text color    
-        
-        box_width = bbox[2] - bbox[0]
-        box_height = bbox[3] - bbox[1]
-        lstyle = '-'
-        ecolor = 'r'
-        tcolor = 'g'
-        if float(box_width)/float(width) < size_ratio_thrsh or float(box_height)/float(height) < size_ratio_thrsh:
-            if FilterSize:
-                continue
-            #print ("bbox width ratio = {}, height ratio = {}".format(float(box_width)/float(width), float(box_height)/float(height)))
-
-        #print("l,t,r,b,score = {}: ({:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f})".format(cls_name, bbox[0], bbox[1], bbox[2], bbox[3], score))
-        line = "{}\t{:.4f}\t{:.4f}\t{:.4f}\t{:.4f}\t{}\n".format(url, bbox[0]/float(width), bbox[1]/float(height), bbox[2]/float(width), bbox[3]/float(height), cls_name) # need to normalized
-        print (line)
-        outStrings += line
-        # show box (off by default)
-        
-    return outStrings
-
 
 def checkMkdir(dir):
     if not osp.isdir(dir):
         os.makedirs(dir)
 
 def main(args):
-    datasetName = 'furniture_val'
+    datasetName = 'fashion_seg_val' #'furniture_val'
     logger = logging.getLogger(__name__)
     merge_cfg_from_file(args.cfg)
-    cfg.NUM_GPUS = 1
+    cfg.NUM_GPUS = 2
     vis = True #False 
+    shuffleList = False #True
     args.weights = cache_url(args.weights, cfg.DOWNLOAD_CACHE)
     assert_and_infer_cfg(cache_urls=False)
     model = infer_engine.initialize_model_from_cfg(args.weights)
@@ -201,52 +140,54 @@ def main(args):
         print (class_thresholds)
     else:
         class_thresholds = None
-    dummy_coco_dataset = dummy_datasets.get_coco_dataset()
+    #dummy_coco_dataset = dummy_datasets.get_coco_dataset()
     dataset = JsonDataset(datasetName)
-    print (args.im_or_folder)
-    if os.path.isdir(args.im_or_folder):
-        im_list = glob.iglob(args.im_or_folder + '/*.' + args.image_ext)
+
+    if args.im_list is None:
+        im_list = glob.glob(args.im_or_folder + '/*.' + args.image_ext)
+        im_list = [osp.basename(n) for n in im_list]
     else:
-        im_list = [args.im_or_folder]
+        im_list = [l.rstrip() + '.jpg' for l in open(args.im_list, 'r').readlines()]
+
+    if shuffleList:
+        from random import shuffle
+        shuffle(im_list)
     checkMkdir(args.output_dir)
-    outTable = osp.join(args.output_dir, 'HF_CT_Measurement_Detected_Boxes.tsv')
-    with open(outTable,'wb') as fout:
-        for i, im_name in enumerate(im_list):
-            out_name = os.path.join(
-                args.output_dir, '{}'.format(os.path.basename(im_name) + '.pdf')
+    #outTable = osp.join(args.output_dir, 'HF_CT_Measurement_Detected_Boxes.tsv')
+    #with open(outTable,'wb') as fout:
+    for i, im_name in enumerate(im_list):
+        output_name = os.path.basename(im_name) + '.png'
+        outFileName = os.path.join(args.output_dir, output_name)
+        if osp.exists(outFileName):
+            print ("{} exists! continue".format(outFileName))
+            continue
+        imgFileName = osp.join(args.im_or_folder, im_name)
+        print (imgFileName)
+        im = cv2.imread(imgFileName)
+        timers = defaultdict(Timer)
+        t = time.time()
+        with c2_utils.NamedCudaScope(0):
+            cls_boxes, cls_segms, cls_keyps = infer_engine.im_detect_all(
+                model, im, None, timers=timers
             )
-            #logger.info('Processing {} -> {}'.format(im_name, out_name))
-            im = cv2.imread(im_name)
-            timers = defaultdict(Timer)
-            t = time.time()
-            with c2_utils.NamedCudaScope(0):
-                cls_boxes, cls_segms, cls_keyps = infer_engine.im_detect_all(
-                    model, im, None, timers=timers
-                )
-            #logger.info('Inference time: {:.3f}s'.format(time.time() - t))
-            #for k, v in timers.items():
-            #    logger.info(' | {}: {:.3f}s'.format(k, v.average_time))
-            if i == 0:
-                logger.info(
-                    ' \ Note: inference on the first image will be slower than the '
-                    'rest (caches and auto-tuning need to warm up)'
-                )
+        logger.info('Inference time: {:.3f}s'.format(time.time() - t))
+        #for k, v in timers.items():
+        #    logger.info(' | {}: {:.3f}s'.format(k, v.average_time))       
             
-            
-            if vis:
-                vis_utils.vis_one_image(
-                    im[:, :, ::-1],  # BGR -> RGB for visualization
-                    im_name,
-                    args.output_dir,
-                    cls_boxes,
-                    cls_segms,
-                    cls_keyps,
-                    dataset=dummy_coco_dataset,
-                    box_alpha=0.3,
-                    show_class=True,
-                    thresh=0.7,
-                    kp_thresh=2
-                )
+        if vis:
+            vis_utils.vis_one_image(
+                im[:, :, ::-1],  # BGR -> RGB for visualization
+                im_name,
+                args.output_dir,
+                cls_boxes,
+                cls_segms,
+                cls_keyps,
+                dataset=dataset, #dummy_coco_dataset,
+                box_alpha=0.3,
+                show_class=True,
+                thresh=0.7,
+                kp_thresh=2
+            )
 
 
 if __name__ == '__main__':
