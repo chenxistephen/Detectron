@@ -149,7 +149,31 @@ def test_net_on_dataset(
     dataset = JsonDataset(dataset_name)
     test_timer = Timer()
     test_timer.tic()
-    if multi_gpu:
+    ################################################################
+    import pickle
+    res_file = os.path.join(
+        output_dir, 'bbox_' + dataset_name + '_results.json'
+    )
+    print ("res_file = {}==========================".format(res_file))
+    if os.path.exists(res_file):
+        import detectron.datasets.json_dataset_evaluator as json_dataset_evaluator
+        print ("res_file = {} exists! Loading res_file".format(res_file))
+        coco_eval = json_dataset_evaluator._do_detection_eval(dataset, res_file, output_dir)
+        box_results = task_evaluation._coco_eval_to_box_results(coco_eval)
+        results = OrderedDict([(dataset.name, box_results)])
+        return results     
+    ################################################################
+    det_name = "detections.pkl"
+    det_file = os.path.join(output_dir, det_name)
+    print ("det_file = {}==========================".format(det_file))
+    if os.path.exists(det_file):
+        print ("{} exists! Loading detection results".format(det_file))
+        res = pickle.load(open(det_file))
+        all_boxes = res['all_boxes']
+        all_segms = res['all_segms']
+        all_keyps = res['all_keyps']
+    ################################################################
+    elif multi_gpu:
         num_images = len(dataset.get_roidb())
         all_boxes, all_segms, all_keyps = multi_gpu_test_net_on_dataset(
             weights_file, dataset_name, proposal_file, num_images, output_dir
@@ -253,6 +277,7 @@ def test_net(
             box_proposals = None
 
         im = cv2.imread(entry['image'])
+        print(entry['image'])
         with c2_utils.NamedCudaScope(gpu_id):
             cls_boxes_i, cls_segms_i, cls_keyps_i = im_detect_all(
                 model, im, box_proposals, timers
@@ -289,6 +314,7 @@ def test_net(
             )
 
         if cfg.VIS:
+            print (os.path.join(output_dir, 'vis'))
             im_name = os.path.splitext(os.path.basename(entry['image']))[0]
             vis_utils.vis_one_image(
                 im[:, :, ::-1],

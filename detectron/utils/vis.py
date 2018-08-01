@@ -251,7 +251,7 @@ def vis_one_image_opencv(
 def vis_one_image(
         im, im_name, output_dir, boxes, segms=None, keypoints=None, thresh=0.9,
         kp_thresh=2, dpi=200, box_alpha=0.0, dataset=None, show_class=False,
-        ext='pdf', out_when_no_box=False):
+        ext='png', out_when_no_box=False):
     """Visual debugging of detections."""
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -389,4 +389,98 @@ def vis_one_image(
 
     output_name = os.path.basename(im_name) + '.' + ext
     fig.savefig(os.path.join(output_dir, '{}'.format(output_name)), dpi=dpi)
+    plt.close('all')
+    
+def vis_detbbox_one_image(
+        im, im_name, output_dir, boxes, segms=None, keypoints=None, class_thresholds=None, thresh=0.5, 
+        FilterPrecScore=True, FilterSize=True,
+        kp_thresh=2, dpi=200, box_alpha=0.0, dataset=None, show_class=True,
+        ext='png'):
+    """Visual debugging of detections."""
+    scoreTopK = 5
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    if isinstance(boxes, list):
+        boxes, segms, keypoints, classes = convert_from_cls_format(
+            boxes, segms, keypoints)
+
+    if boxes is None or boxes.shape[0] == 0 or max(boxes[:, 4]) < thresh:
+        return
+
+    dataset_keypoints, _ = keypoint_utils.get_keypoints()
+
+    if segms is not None and len(segms) > 0:
+        masks = mask_util.decode(segms)
+
+    color_list = colormap(rgb=True) / 255
+
+    kp_lines = kp_connections(dataset_keypoints)
+    cmap = plt.get_cmap('rainbow')
+    colors = [cmap(i) for i in np.linspace(0, 1, len(kp_lines) + 2)]
+
+    fig = plt.figure(frameon=False)
+    fig.set_size_inches(im.shape[1] / dpi, im.shape[0] / dpi)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.axis('off')
+    fig.add_axes(ax)
+    ax.imshow(im)
+
+    # Display in largest to smallest order to reduce occlusion
+    areas = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
+    out_scores = boxes[:,-1]
+    print ("len(out_scores) = {}".format(len(out_scores)))
+    #sorted_inds = np.argsort(-areas)
+    sorted_inds = np.argsort(-out_scores)
+    height, width, channels = im.shape
+    size_ratio_thrsh = 0.15
+    mask_color_id = 0
+    for i in sorted_inds[:scoreTopK]:
+        bbox = boxes[i, :4]
+        score = boxes[i, -1]
+        cls_name = dataset.classes[classes[i]]
+        cls_thrsh = class_thresholds[cls_name] if class_thresholds is not None else thresh
+        if score < thresh: #cls_thrsh:
+            continue
+
+
+        if score < cls_thrsh:
+            if FilterPrecScore:
+                continue
+            ecolor = 'm'
+            tcolor = 'm' # text color    
+        
+        box_width = bbox[2] - bbox[0]
+        box_height = bbox[3] - bbox[1]
+        lstyle = '-'
+        ecolor = 'r'
+        tcolor = 'g'
+        if float(box_width)/float(width) < size_ratio_thrsh or float(box_height)/float(height) < size_ratio_thrsh:
+            if FilterSize:
+                continue
+            #print ("bbox width ratio = {}, height ratio = {}".format(float(box_width)/float(width), float(box_height)/float(height)))
+            lstyle = '--'
+        print("{}: ({:.3f}, {:.3f}, {:.3f}, {:.3f}), {:.3f}".format(dataset.classes[classes[i]], bbox[0], bbox[1], bbox[2], bbox[3], score))
+        # show box (off by default)
+        ax.add_patch(
+            plt.Rectangle((bbox[0], bbox[1]),
+                          bbox[2] - bbox[0],
+                          bbox[3] - bbox[1],
+                          fill=False, edgecolor=ecolor,
+                          linestyle=lstyle,
+                          linewidth=1.0))
+
+        if show_class:
+            ax.text(
+                bbox[0], bbox[1] - 2,
+                get_class_string(classes[i], score, dataset),
+                fontsize=5,
+                #family='serif',
+                bbox=dict(
+                    facecolor=tcolor, alpha=0.9, edgecolor='none'),
+                color='white')
+
+
+    output_name = os.path.basename(im_name) + '.' + ext
+    fig.savefig(os.path.join(output_dir, '{}'.format(output_name)), dpi=dpi, bbox_inches='tight', pad_inches=0)
     plt.close('all')
