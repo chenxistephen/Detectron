@@ -61,11 +61,11 @@ _DATASETS = {
         _ANN_FN:
             _DATA_DIR + '/Logo/json_annotations/train_annotations.json'
     },
-    'logo_1048_test': {
+    'logo_1048_val': {
         _IM_DIR:
             _DATA_DIR + '/Logo/Images',
         _ANN_FN:
-            _DATA_DIR + '/Logo/json_annotations/test_annotations.json'
+            _DATA_DIR + '/Logo/json_annotations/val_annotations.json'
     },
     'furniture_train': {
         _IM_DIR:
