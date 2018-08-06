@@ -6,11 +6,8 @@ GPUS=$2
 SCALE=$3
 
 CUDA_VISIBLE_DEVICES="$GPUS" python2 tools/test_net.py \
-    --cfg configs/Logo/logo_retinanet_1gpu_R-101-FPN_1x.yaml \
+    --cfg configs/Logo/e2e_faster_rcnn_R-50-FPN_1x.yaml \
     TEST.WEIGHTS Trained_Models/Logo/$MODEL_NAME/model_final.pkl \
     OUTPUT_DIR detectron-output/Logo/$MODEL_NAME \
     TEST.DATASETS "('$TESTATT',)" \
-    NUM_GPUS 1 \
-    TEST.SCALE $SCALE \
-    VIS False \
-    VIS_TH 0.5
+    NUM_GPUS 1 #TEST.SCALE $SCALE
