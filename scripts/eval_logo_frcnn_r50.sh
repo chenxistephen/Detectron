@@ -8,6 +8,8 @@ SCALE=$3
 CUDA_VISIBLE_DEVICES="$GPUS" python2 tools/test_net.py \
     --cfg configs/Logo/e2e_faster_rcnn_R-50-FPN_1x.yaml \
     TEST.WEIGHTS Trained_Models/Logo/$MODEL_NAME/model_final.pkl \
-    OUTPUT_DIR detectron-output/Logo/$MODEL_NAME \
+    OUTPUT_DIR detectron-output/Logo/$MODEL_NAME/Test_$SCALE \
     TEST.DATASETS "('$TESTATT',)" \
-    NUM_GPUS 1 #TEST.SCALE $SCALE
+    NUM_GPUS 1 \
+    TEST.SCALE $SCALE \
+    | tee eval_$MODEL_NAME-Test_$SCALE.log
