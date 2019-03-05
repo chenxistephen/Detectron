@@ -12,4 +12,4 @@ CUDA_VISIBLE_DEVICES="$GPUS" python2 tools/test_net.py \
     TEST.DATASETS "('$TESTATT',)" \
     NUM_GPUS 1 \
     TEST.SCALE $SCALE \
-    | tee eval_$MODEL_NAME-Test_$SCALE.log
+    2>&1 | tee eval_$MODEL_NAME-Test_$SCALE.log
