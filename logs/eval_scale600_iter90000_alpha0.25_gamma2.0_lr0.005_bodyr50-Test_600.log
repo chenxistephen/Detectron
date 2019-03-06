@@ -1,0 +1,502 @@
+Found Detectron ops lib: /home/chnxi/miniconda3/envs/detectron/lib/python3.6/site-packages/torch/lib/libcaffe2_detectron_ops_gpu.so
+INFO test_net.py:  98: Called with args:
+INFO test_net.py:  99: Namespace(cfg_file='configs/OpenImage/retinanet_1gpu_R-50-FPN_1x.yaml', multi_gpu_testing=False, opts=['TEST.WEIGHTS', 'Trained_Models/OpenImage/scale600_iter90000_alpha0.25_gamma2.0_lr0.005_bodyr50/model_final.pkl', 'OUTPUT_DIR', 'detectron-output/OpenImage/scale600_iter90000_alpha0.25_gamma2.0_lr0.005_bodyr50/Test_600', 'TEST.DATASETS', "('OpenImage_val',)", 'NUM_GPUS', '1', 'TEST.SCALE', '600'], range=None, vis=False, wait=True)
+INFO test_net.py: 105: Testing with config:
+INFO test_net.py: 106: {'BBOX_XFORM_CLIP': 4.135166556742356,
+ 'CLUSTER': {'ON_CLUSTER': False},
+ 'DATA_LOADER': {'BLOBS_QUEUE_CAPACITY': 8,
+                 'MINIBATCH_QUEUE_SIZE': 64,
+                 'NUM_THREADS': 4},
+ 'DEDUP_BOXES': 0.0625,
+ 'DOWNLOAD_CACHE': '/tmp/detectron-download-cache',
+ 'EPS': 1e-14,
+ 'EXPECTED_RESULTS': [],
+ 'EXPECTED_RESULTS_ATOL': 0.005,
+ 'EXPECTED_RESULTS_EMAIL': '',
+ 'EXPECTED_RESULTS_RTOL': 0.1,
+ 'EXPECTED_RESULTS_SIGMA_TOL': 4,
+ 'FAST_RCNN': {'CONV_HEAD_DIM': 256,
+               'MLP_HEAD_DIM': 1024,
+               'NUM_STACKED_CONVS': 4,
+               'ROI_BOX_HEAD': '',
+               'ROI_XFORM_METHOD': 'RoIPoolF',
+               'ROI_XFORM_RESOLUTION': 14,
+               'ROI_XFORM_SAMPLING_RATIO': 0},
+ 'FPN': {'COARSEST_STRIDE': 128,
+         'DIM': 256,
+         'EXTRA_CONV_LEVELS': True,
+         'FPN_ON': True,
+         'MULTILEVEL_ROIS': False,
+         'MULTILEVEL_RPN': True,
+         'ROI_CANONICAL_LEVEL': 4,
+         'ROI_CANONICAL_SCALE': 224,
+         'ROI_MAX_LEVEL': 5,
+         'ROI_MIN_LEVEL': 2,
+         'RPN_ANCHOR_START_SIZE': 32,
+         'RPN_ASPECT_RATIOS': (0.5, 1, 2),
+         'RPN_MAX_LEVEL': 7,
+         'RPN_MIN_LEVEL': 3,
+         'USE_GN': False,
+         'ZERO_INIT_LATERAL': False},
+ 'GROUP_NORM': {'DIM_PER_GP': -1, 'EPSILON': 1e-05, 'NUM_GROUPS': 32},
+ 'KRCNN': {'CONV_HEAD_DIM': 256,
+           'CONV_HEAD_KERNEL': 3,
+           'CONV_INIT': 'GaussianFill',
+           'DECONV_DIM': 256,
+           'DECONV_KERNEL': 4,
+           'DILATION': 1,
+           'HEATMAP_SIZE': -1,
+           'INFERENCE_MIN_SIZE': 0,
+           'KEYPOINT_CONFIDENCE': 'bbox',
+           'LOSS_WEIGHT': 1.0,
+           'MIN_KEYPOINT_COUNT_FOR_VALID_MINIBATCH': 20,
+           'NMS_OKS': False,
+           'NORMALIZE_BY_VISIBLE_KEYPOINTS': True,
+           'NUM_KEYPOINTS': -1,
+           'NUM_STACKED_CONVS': 8,
+           'ROI_KEYPOINTS_HEAD': '',
+           'ROI_XFORM_METHOD': 'RoIAlign',
+           'ROI_XFORM_RESOLUTION': 7,
+           'ROI_XFORM_SAMPLING_RATIO': 0,
+           'UP_SCALE': -1,
+           'USE_DECONV': False,
+           'USE_DECONV_OUTPUT': False},
+ 'MATLAB': 'matlab',
+ 'MEMONGER': True,
+ 'MEMONGER_SHARE_ACTIVATIONS': False,
+ 'MODEL': {'BBOX_REG_WEIGHTS': (10.0, 10.0, 5.0, 5.0),
+           'CLS_AGNOSTIC_BBOX_REG': False,
+           'CONV_BODY': 'FPN.add_fpn_ResNet50_conv5_body',
+           'EXECUTION_TYPE': 'dag',
+           'FASTER_RCNN': False,
+           'KEYPOINTS_ON': False,
+           'MASK_ON': False,
+           'NUM_CLASSES': 602,
+           'RPN_ONLY': False,
+           'TYPE': 'retinanet'},
+ 'MRCNN': {'CLS_SPECIFIC_MASK': True,
+           'CONV_INIT': 'GaussianFill',
+           'DILATION': 2,
+           'DIM_REDUCED': 256,
+           'RESOLUTION': 14,
+           'ROI_MASK_HEAD': '',
+           'ROI_XFORM_METHOD': 'RoIAlign',
+           'ROI_XFORM_RESOLUTION': 7,
+           'ROI_XFORM_SAMPLING_RATIO': 0,
+           'THRESH_BINARIZE': 0.5,
+           'UPSAMPLE_RATIO': 1,
+           'USE_FC_OUTPUT': False,
+           'WEIGHT_LOSS_MASK': 1.0},
+ 'NUM_GPUS': 1,
+ 'OUTPUT_DIR': 'detectron-output/OpenImage/scale600_iter90000_alpha0.25_gamma2.0_lr0.005_bodyr50/Test_600',
+ 'PIXEL_MEANS': array([[[102.9801, 115.9465, 122.7717]]]),
+ 'RESNETS': {'NUM_GROUPS': 1,
+             'RES5_DILATION': 1,
+             'SHORTCUT_FUNC': 'basic_bn_shortcut',
+             'STEM_FUNC': 'basic_bn_stem',
+             'STRIDE_1X1': True,
+             'TRANS_FUNC': 'bottleneck_transformation',
+             'WIDTH_PER_GROUP': 64},
+ 'RETINANET': {'ANCHOR_SCALE': 4,
+               'ASPECT_RATIOS': (1.0, 2.0, 0.5),
+               'BBOX_REG_BETA': 0.11,
+               'BBOX_REG_WEIGHT': 1.0,
+               'CLASS_SPECIFIC_BBOX': False,
+               'INFERENCE_TH': 0.05,
+               'LOSS_ALPHA': 0.25,
+               'LOSS_GAMMA': 2.0,
+               'NEGATIVE_OVERLAP': 0.4,
+               'NUM_CONVS': 4,
+               'POSITIVE_OVERLAP': 0.5,
+               'PRE_NMS_TOP_N': 1000,
+               'PRIOR_PROB': 0.01,
+               'RETINANET_ON': True,
+               'SCALES_PER_OCTAVE': 3,
+               'SHARE_CLS_BBOX_TOWER': False,
+               'SOFTMAX': False},
+ 'RFCN': {'PS_GRID_SIZE': 3},
+ 'RNG_SEED': 3,
+ 'ROOT_DIR': '/home/chnxi/github/Detectron_20190219',
+ 'RPN': {'ASPECT_RATIOS': (0.5, 1, 2),
+         'RPN_ON': False,
+         'SIZES': (64, 128, 256, 512),
+         'STRIDE': 16},
+ 'SOLVER': {'BASE_LR': 0.00125,
+            'GAMMA': 0.1,
+            'LOG_LR_CHANGE_THRESHOLD': 1.1,
+            'LRS': [],
+            'LR_POLICY': 'steps_with_decay',
+            'MAX_ITER': 720000,
+            'MOMENTUM': 0.9,
+            'SCALE_MOMENTUM': True,
+            'SCALE_MOMENTUM_THRESHOLD': 1.1,
+            'STEPS': [0, 480000, 640000],
+            'STEP_SIZE': 30000,
+            'WARM_UP_FACTOR': 0.3333333333333333,
+            'WARM_UP_ITERS': 500,
+            'WARM_UP_METHOD': 'linear',
+            'WEIGHT_DECAY': 0.0001,
+            'WEIGHT_DECAY_GN': 0.0},
+ 'TEST': {'BBOX_AUG': {'AREA_TH_HI': 32400,
+                       'AREA_TH_LO': 2500,
+                       'ASPECT_RATIOS': (),
+                       'ASPECT_RATIO_H_FLIP': False,
+                       'COORD_HEUR': 'UNION',
+                       'ENABLED': False,
+                       'H_FLIP': False,
+                       'MAX_SIZE': 4000,
+                       'SCALES': (),
+                       'SCALE_H_FLIP': False,
+                       'SCALE_SIZE_DEP': False,
+                       'SCORE_HEUR': 'UNION'},
+          'BBOX_REG': True,
+          'BBOX_VOTE': {'ENABLED': False,
+                        'SCORING_METHOD': 'ID',
+                        'SCORING_METHOD_BETA': 1.0,
+                        'VOTE_TH': 0.8},
+          'COMPETITION_MODE': True,
+          'DATASETS': ('OpenImage_val',),
+          'DETECTIONS_PER_IM': 100,
+          'FORCE_JSON_DATASET_EVAL': True,
+          'KPS_AUG': {'AREA_TH': 32400,
+                      'ASPECT_RATIOS': (),
+                      'ASPECT_RATIO_H_FLIP': False,
+                      'ENABLED': False,
+                      'HEUR': 'HM_AVG',
+                      'H_FLIP': False,
+                      'MAX_SIZE': 4000,
+                      'SCALES': (),
+                      'SCALE_H_FLIP': False,
+                      'SCALE_SIZE_DEP': False},
+          'MASK_AUG': {'AREA_TH': 32400,
+                       'ASPECT_RATIOS': (),
+                       'ASPECT_RATIO_H_FLIP': False,
+                       'ENABLED': False,
+                       'HEUR': 'SOFT_AVG',
+                       'H_FLIP': False,
+                       'MAX_SIZE': 4000,
+                       'SCALES': (),
+                       'SCALE_H_FLIP': False,
+                       'SCALE_SIZE_DEP': False},
+          'MAX_SIZE': 1333,
+          'NMS': 0.5,
+          'PRECOMPUTED_PROPOSALS': False,
+          'PROPOSAL_FILES': (),
+          'PROPOSAL_LIMIT': 2000,
+          'RPN_MIN_SIZE': 0,
+          'RPN_NMS_THRESH': 0.7,
+          'RPN_POST_NMS_TOP_N': 2000,
+          'RPN_PRE_NMS_TOP_N': 10000,
+          'SCALE': 600,
+          'SCORE_THRESH': 0.05,
+          'SOFT_NMS': {'ENABLED': False, 'METHOD': 'linear', 'SIGMA': 0.5},
+          'WEIGHTS': 'Trained_Models/OpenImage/scale600_iter90000_alpha0.25_gamma2.0_lr0.005_bodyr50/model_final.pkl'},
+ 'TRAIN': {'ASPECT_GROUPING': True,
+           'AUTO_RESUME': True,
+           'BATCH_SIZE_PER_IM': 64,
+           'BBOX_THRESH': 0.5,
+           'BG_THRESH_HI': 0.5,
+           'BG_THRESH_LO': 0.0,
+           'COPY_WEIGHTS': False,
+           'CROWD_FILTER_THRESH': 0.7,
+           'DATASETS': ('OpenImage_val',),
+           'FG_FRACTION': 0.25,
+           'FG_THRESH': 0.5,
+           'FREEZE_AT': 2,
+           'FREEZE_CONV_BODY': False,
+           'GT_MIN_AREA': -1,
+           'IMS_PER_BATCH': 2,
+           'MAX_SIZE': 1333,
+           'PROPOSAL_FILES': (),
+           'RPN_BATCH_SIZE_PER_IM': 256,
+           'RPN_FG_FRACTION': 0.5,
+           'RPN_MIN_SIZE': 0,
+           'RPN_NEGATIVE_OVERLAP': 0.3,
+           'RPN_NMS_THRESH': 0.7,
+           'RPN_POSITIVE_OVERLAP': 0.7,
+           'RPN_POST_NMS_TOP_N': 2000,
+           'RPN_PRE_NMS_TOP_N': 12000,
+           'RPN_STRADDLE_THRESH': -1,
+           'SCALES': (800,),
+           'SNAPSHOT_ITERS': 20000,
+           'USE_FLIPPED': True,
+           'WEIGHTS': '/tmp/detectron-download-cache/ImageNetPretrained/MSRA/R-50.pkl'},
+ 'USE_NCCL': False,
+ 'VIS': False,
+ 'VIS_TH': 0.9}
+loading annotations into memory...
+Done (t=1.13s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=1.11s)
+creating index...
+index created!
+WARNING cnn.py:  25: [====DEPRECATE WARNING====]: you are creating an object from CNNModelHelper class which will be deprecated soon. Please use ModelHelper object with brew module. For more information, please refer to caffe2.ai and python/brew.py, python/brew_test.py for more information.
+INFO net.py:  60: Loading weights from: Trained_Models/OpenImage/scale600_iter90000_alpha0.25_gamma2.0_lr0.005_bodyr50/model_final.pkl
+INFO net.py:  96: conv1_w loaded from weights file into gpu_0/conv1_w: (64, 3, 7, 7)
+INFO net.py:  96: res_conv1_bn_s loaded from weights file into gpu_0/res_conv1_bn_s: (64,)
+INFO net.py:  96: res_conv1_bn_b loaded from weights file into gpu_0/res_conv1_bn_b: (64,)
+INFO net.py:  96: res2_0_branch2a_w loaded from weights file into gpu_0/res2_0_branch2a_w: (64, 64, 1, 1)
+INFO net.py:  96: res2_0_branch2a_bn_s loaded from weights file into gpu_0/res2_0_branch2a_bn_s: (64,)
+INFO net.py:  96: res2_0_branch2a_bn_b loaded from weights file into gpu_0/res2_0_branch2a_bn_b: (64,)
+INFO net.py:  96: res2_0_branch2b_w loaded from weights file into gpu_0/res2_0_branch2b_w: (64, 64, 3, 3)
+INFO net.py:  96: res2_0_branch2b_bn_s loaded from weights file into gpu_0/res2_0_branch2b_bn_s: (64,)
+INFO net.py:  96: res2_0_branch2b_bn_b loaded from weights file into gpu_0/res2_0_branch2b_bn_b: (64,)
+INFO net.py:  96: res2_0_branch2c_w loaded from weights file into gpu_0/res2_0_branch2c_w: (256, 64, 1, 1)
+INFO net.py:  96: res2_0_branch2c_bn_s loaded from weights file into gpu_0/res2_0_branch2c_bn_s: (256,)
+INFO net.py:  96: res2_0_branch2c_bn_b loaded from weights file into gpu_0/res2_0_branch2c_bn_b: (256,)
+INFO net.py:  96: res2_0_branch1_w loaded from weights file into gpu_0/res2_0_branch1_w: (256, 64, 1, 1)
+INFO net.py:  96: res2_0_branch1_bn_s loaded from weights file into gpu_0/res2_0_branch1_bn_s: (256,)
+INFO net.py:  96: res2_0_branch1_bn_b loaded from weights file into gpu_0/res2_0_branch1_bn_b: (256,)
+INFO net.py:  96: res2_1_branch2a_w loaded from weights file into gpu_0/res2_1_branch2a_w: (64, 256, 1, 1)
+INFO net.py:  96: res2_1_branch2a_bn_s loaded from weights file into gpu_0/res2_1_branch2a_bn_s: (64,)
+INFO net.py:  96: res2_1_branch2a_bn_b loaded from weights file into gpu_0/res2_1_branch2a_bn_b: (64,)
+INFO net.py:  96: res2_1_branch2b_w loaded from weights file into gpu_0/res2_1_branch2b_w: (64, 64, 3, 3)
+INFO net.py:  96: res2_1_branch2b_bn_s loaded from weights file into gpu_0/res2_1_branch2b_bn_s: (64,)
+INFO net.py:  96: res2_1_branch2b_bn_b loaded from weights file into gpu_0/res2_1_branch2b_bn_b: (64,)
+INFO net.py:  96: res2_1_branch2c_w loaded from weights file into gpu_0/res2_1_branch2c_w: (256, 64, 1, 1)
+INFO net.py:  96: res2_1_branch2c_bn_s loaded from weights file into gpu_0/res2_1_branch2c_bn_s: (256,)
+INFO net.py:  96: res2_1_branch2c_bn_b loaded from weights file into gpu_0/res2_1_branch2c_bn_b: (256,)
+INFO net.py:  96: res2_2_branch2a_w loaded from weights file into gpu_0/res2_2_branch2a_w: (64, 256, 1, 1)
+INFO net.py:  96: res2_2_branch2a_bn_s loaded from weights file into gpu_0/res2_2_branch2a_bn_s: (64,)
+INFO net.py:  96: res2_2_branch2a_bn_b loaded from weights file into gpu_0/res2_2_branch2a_bn_b: (64,)
+INFO net.py:  96: res2_2_branch2b_w loaded from weights file into gpu_0/res2_2_branch2b_w: (64, 64, 3, 3)
+INFO net.py:  96: res2_2_branch2b_bn_s loaded from weights file into gpu_0/res2_2_branch2b_bn_s: (64,)
+INFO net.py:  96: res2_2_branch2b_bn_b loaded from weights file into gpu_0/res2_2_branch2b_bn_b: (64,)
+INFO net.py:  96: res2_2_branch2c_w loaded from weights file into gpu_0/res2_2_branch2c_w: (256, 64, 1, 1)
+INFO net.py:  96: res2_2_branch2c_bn_s loaded from weights file into gpu_0/res2_2_branch2c_bn_s: (256,)
+INFO net.py:  96: res2_2_branch2c_bn_b loaded from weights file into gpu_0/res2_2_branch2c_bn_b: (256,)
+INFO net.py:  96: res3_0_branch2a_w [+ momentum] loaded from weights file into gpu_0/res3_0_branch2a_w: (128, 256, 1, 1)
+INFO net.py:  96: res3_0_branch2a_bn_s loaded from weights file into gpu_0/res3_0_branch2a_bn_s: (128,)
+INFO net.py:  96: res3_0_branch2a_bn_b loaded from weights file into gpu_0/res3_0_branch2a_bn_b: (128,)
+INFO net.py:  96: res3_0_branch2b_w [+ momentum] loaded from weights file into gpu_0/res3_0_branch2b_w: (128, 128, 3, 3)
+INFO net.py:  96: res3_0_branch2b_bn_s loaded from weights file into gpu_0/res3_0_branch2b_bn_s: (128,)
+INFO net.py:  96: res3_0_branch2b_bn_b loaded from weights file into gpu_0/res3_0_branch2b_bn_b: (128,)
+INFO net.py:  96: res3_0_branch2c_w [+ momentum] loaded from weights file into gpu_0/res3_0_branch2c_w: (512, 128, 1, 1)
+INFO net.py:  96: res3_0_branch2c_bn_s loaded from weights file into gpu_0/res3_0_branch2c_bn_s: (512,)
+INFO net.py:  96: res3_0_branch2c_bn_b loaded from weights file into gpu_0/res3_0_branch2c_bn_b: (512,)
+INFO net.py:  96: res3_0_branch1_w [+ momentum] loaded from weights file into gpu_0/res3_0_branch1_w: (512, 256, 1, 1)
+INFO net.py:  96: res3_0_branch1_bn_s loaded from weights file into gpu_0/res3_0_branch1_bn_s: (512,)
+INFO net.py:  96: res3_0_branch1_bn_b loaded from weights file into gpu_0/res3_0_branch1_bn_b: (512,)
+INFO net.py:  96: res3_1_branch2a_w [+ momentum] loaded from weights file into gpu_0/res3_1_branch2a_w: (128, 512, 1, 1)
+INFO net.py:  96: res3_1_branch2a_bn_s loaded from weights file into gpu_0/res3_1_branch2a_bn_s: (128,)
+INFO net.py:  96: res3_1_branch2a_bn_b loaded from weights file into gpu_0/res3_1_branch2a_bn_b: (128,)
+INFO net.py:  96: res3_1_branch2b_w [+ momentum] loaded from weights file into gpu_0/res3_1_branch2b_w: (128, 128, 3, 3)
+INFO net.py:  96: res3_1_branch2b_bn_s loaded from weights file into gpu_0/res3_1_branch2b_bn_s: (128,)
+INFO net.py:  96: res3_1_branch2b_bn_b loaded from weights file into gpu_0/res3_1_branch2b_bn_b: (128,)
+INFO net.py:  96: res3_1_branch2c_w [+ momentum] loaded from weights file into gpu_0/res3_1_branch2c_w: (512, 128, 1, 1)
+INFO net.py:  96: res3_1_branch2c_bn_s loaded from weights file into gpu_0/res3_1_branch2c_bn_s: (512,)
+INFO net.py:  96: res3_1_branch2c_bn_b loaded from weights file into gpu_0/res3_1_branch2c_bn_b: (512,)
+INFO net.py:  96: res3_2_branch2a_w [+ momentum] loaded from weights file into gpu_0/res3_2_branch2a_w: (128, 512, 1, 1)
+INFO net.py:  96: res3_2_branch2a_bn_s loaded from weights file into gpu_0/res3_2_branch2a_bn_s: (128,)
+INFO net.py:  96: res3_2_branch2a_bn_b loaded from weights file into gpu_0/res3_2_branch2a_bn_b: (128,)
+INFO net.py:  96: res3_2_branch2b_w [+ momentum] loaded from weights file into gpu_0/res3_2_branch2b_w: (128, 128, 3, 3)
+INFO net.py:  96: res3_2_branch2b_bn_s loaded from weights file into gpu_0/res3_2_branch2b_bn_s: (128,)
+INFO net.py:  96: res3_2_branch2b_bn_b loaded from weights file into gpu_0/res3_2_branch2b_bn_b: (128,)
+INFO net.py:  96: res3_2_branch2c_w [+ momentum] loaded from weights file into gpu_0/res3_2_branch2c_w: (512, 128, 1, 1)
+INFO net.py:  96: res3_2_branch2c_bn_s loaded from weights file into gpu_0/res3_2_branch2c_bn_s: (512,)
+INFO net.py:  96: res3_2_branch2c_bn_b loaded from weights file into gpu_0/res3_2_branch2c_bn_b: (512,)
+INFO net.py:  96: res3_3_branch2a_w [+ momentum] loaded from weights file into gpu_0/res3_3_branch2a_w: (128, 512, 1, 1)
+INFO net.py:  96: res3_3_branch2a_bn_s loaded from weights file into gpu_0/res3_3_branch2a_bn_s: (128,)
+INFO net.py:  96: res3_3_branch2a_bn_b loaded from weights file into gpu_0/res3_3_branch2a_bn_b: (128,)
+INFO net.py:  96: res3_3_branch2b_w [+ momentum] loaded from weights file into gpu_0/res3_3_branch2b_w: (128, 128, 3, 3)
+INFO net.py:  96: res3_3_branch2b_bn_s loaded from weights file into gpu_0/res3_3_branch2b_bn_s: (128,)
+INFO net.py:  96: res3_3_branch2b_bn_b loaded from weights file into gpu_0/res3_3_branch2b_bn_b: (128,)
+INFO net.py:  96: res3_3_branch2c_w [+ momentum] loaded from weights file into gpu_0/res3_3_branch2c_w: (512, 128, 1, 1)
+INFO net.py:  96: res3_3_branch2c_bn_s loaded from weights file into gpu_0/res3_3_branch2c_bn_s: (512,)
+INFO net.py:  96: res3_3_branch2c_bn_b loaded from weights file into gpu_0/res3_3_branch2c_bn_b: (512,)
+INFO net.py:  96: res4_0_branch2a_w [+ momentum] loaded from weights file into gpu_0/res4_0_branch2a_w: (256, 512, 1, 1)
+INFO net.py:  96: res4_0_branch2a_bn_s loaded from weights file into gpu_0/res4_0_branch2a_bn_s: (256,)
+INFO net.py:  96: res4_0_branch2a_bn_b loaded from weights file into gpu_0/res4_0_branch2a_bn_b: (256,)
+INFO net.py:  96: res4_0_branch2b_w [+ momentum] loaded from weights file into gpu_0/res4_0_branch2b_w: (256, 256, 3, 3)
+INFO net.py:  96: res4_0_branch2b_bn_s loaded from weights file into gpu_0/res4_0_branch2b_bn_s: (256,)
+INFO net.py:  96: res4_0_branch2b_bn_b loaded from weights file into gpu_0/res4_0_branch2b_bn_b: (256,)
+INFO net.py:  96: res4_0_branch2c_w [+ momentum] loaded from weights file into gpu_0/res4_0_branch2c_w: (1024, 256, 1, 1)
+INFO net.py:  96: res4_0_branch2c_bn_s loaded from weights file into gpu_0/res4_0_branch2c_bn_s: (1024,)
+INFO net.py:  96: res4_0_branch2c_bn_b loaded from weights file into gpu_0/res4_0_branch2c_bn_b: (1024,)
+INFO net.py:  96: res4_0_branch1_w [+ momentum] loaded from weights file into gpu_0/res4_0_branch1_w: (1024, 512, 1, 1)
+INFO net.py:  96: res4_0_branch1_bn_s loaded from weights file into gpu_0/res4_0_branch1_bn_s: (1024,)
+INFO net.py:  96: res4_0_branch1_bn_b loaded from weights file into gpu_0/res4_0_branch1_bn_b: (1024,)
+INFO net.py:  96: res4_1_branch2a_w [+ momentum] loaded from weights file into gpu_0/res4_1_branch2a_w: (256, 1024, 1, 1)
+INFO net.py:  96: res4_1_branch2a_bn_s loaded from weights file into gpu_0/res4_1_branch2a_bn_s: (256,)
+INFO net.py:  96: res4_1_branch2a_bn_b loaded from weights file into gpu_0/res4_1_branch2a_bn_b: (256,)
+INFO net.py:  96: res4_1_branch2b_w [+ momentum] loaded from weights file into gpu_0/res4_1_branch2b_w: (256, 256, 3, 3)
+INFO net.py:  96: res4_1_branch2b_bn_s loaded from weights file into gpu_0/res4_1_branch2b_bn_s: (256,)
+INFO net.py:  96: res4_1_branch2b_bn_b loaded from weights file into gpu_0/res4_1_branch2b_bn_b: (256,)
+INFO net.py:  96: res4_1_branch2c_w [+ momentum] loaded from weights file into gpu_0/res4_1_branch2c_w: (1024, 256, 1, 1)
+INFO net.py:  96: res4_1_branch2c_bn_s loaded from weights file into gpu_0/res4_1_branch2c_bn_s: (1024,)
+INFO net.py:  96: res4_1_branch2c_bn_b loaded from weights file into gpu_0/res4_1_branch2c_bn_b: (1024,)
+INFO net.py:  96: res4_2_branch2a_w [+ momentum] loaded from weights file into gpu_0/res4_2_branch2a_w: (256, 1024, 1, 1)
+INFO net.py:  96: res4_2_branch2a_bn_s loaded from weights file into gpu_0/res4_2_branch2a_bn_s: (256,)
+INFO net.py:  96: res4_2_branch2a_bn_b loaded from weights file into gpu_0/res4_2_branch2a_bn_b: (256,)
+INFO net.py:  96: res4_2_branch2b_w [+ momentum] loaded from weights file into gpu_0/res4_2_branch2b_w: (256, 256, 3, 3)
+INFO net.py:  96: res4_2_branch2b_bn_s loaded from weights file into gpu_0/res4_2_branch2b_bn_s: (256,)
+INFO net.py:  96: res4_2_branch2b_bn_b loaded from weights file into gpu_0/res4_2_branch2b_bn_b: (256,)
+INFO net.py:  96: res4_2_branch2c_w [+ momentum] loaded from weights file into gpu_0/res4_2_branch2c_w: (1024, 256, 1, 1)
+INFO net.py:  96: res4_2_branch2c_bn_s loaded from weights file into gpu_0/res4_2_branch2c_bn_s: (1024,)
+INFO net.py:  96: res4_2_branch2c_bn_b loaded from weights file into gpu_0/res4_2_branch2c_bn_b: (1024,)
+INFO net.py:  96: res4_3_branch2a_w [+ momentum] loaded from weights file into gpu_0/res4_3_branch2a_w: (256, 1024, 1, 1)
+INFO net.py:  96: res4_3_branch2a_bn_s loaded from weights file into gpu_0/res4_3_branch2a_bn_s: (256,)
+INFO net.py:  96: res4_3_branch2a_bn_b loaded from weights file into gpu_0/res4_3_branch2a_bn_b: (256,)
+INFO net.py:  96: res4_3_branch2b_w [+ momentum] loaded from weights file into gpu_0/res4_3_branch2b_w: (256, 256, 3, 3)
+INFO net.py:  96: res4_3_branch2b_bn_s loaded from weights file into gpu_0/res4_3_branch2b_bn_s: (256,)
+INFO net.py:  96: res4_3_branch2b_bn_b loaded from weights file into gpu_0/res4_3_branch2b_bn_b: (256,)
+INFO net.py:  96: res4_3_branch2c_w [+ momentum] loaded from weights file into gpu_0/res4_3_branch2c_w: (1024, 256, 1, 1)
+INFO net.py:  96: res4_3_branch2c_bn_s loaded from weights file into gpu_0/res4_3_branch2c_bn_s: (1024,)
+INFO net.py:  96: res4_3_branch2c_bn_b loaded from weights file into gpu_0/res4_3_branch2c_bn_b: (1024,)
+INFO net.py:  96: res4_4_branch2a_w [+ momentum] loaded from weights file into gpu_0/res4_4_branch2a_w: (256, 1024, 1, 1)
+INFO net.py:  96: res4_4_branch2a_bn_s loaded from weights file into gpu_0/res4_4_branch2a_bn_s: (256,)
+INFO net.py:  96: res4_4_branch2a_bn_b loaded from weights file into gpu_0/res4_4_branch2a_bn_b: (256,)
+INFO net.py:  96: res4_4_branch2b_w [+ momentum] loaded from weights file into gpu_0/res4_4_branch2b_w: (256, 256, 3, 3)
+INFO net.py:  96: res4_4_branch2b_bn_s loaded from weights file into gpu_0/res4_4_branch2b_bn_s: (256,)
+INFO net.py:  96: res4_4_branch2b_bn_b loaded from weights file into gpu_0/res4_4_branch2b_bn_b: (256,)
+INFO net.py:  96: res4_4_branch2c_w [+ momentum] loaded from weights file into gpu_0/res4_4_branch2c_w: (1024, 256, 1, 1)
+INFO net.py:  96: res4_4_branch2c_bn_s loaded from weights file into gpu_0/res4_4_branch2c_bn_s: (1024,)
+INFO net.py:  96: res4_4_branch2c_bn_b loaded from weights file into gpu_0/res4_4_branch2c_bn_b: (1024,)
+INFO net.py:  96: res4_5_branch2a_w [+ momentum] loaded from weights file into gpu_0/res4_5_branch2a_w: (256, 1024, 1, 1)
+INFO net.py:  96: res4_5_branch2a_bn_s loaded from weights file into gpu_0/res4_5_branch2a_bn_s: (256,)
+INFO net.py:  96: res4_5_branch2a_bn_b loaded from weights file into gpu_0/res4_5_branch2a_bn_b: (256,)
+INFO net.py:  96: res4_5_branch2b_w [+ momentum] loaded from weights file into gpu_0/res4_5_branch2b_w: (256, 256, 3, 3)
+INFO net.py:  96: res4_5_branch2b_bn_s loaded from weights file into gpu_0/res4_5_branch2b_bn_s: (256,)
+INFO net.py:  96: res4_5_branch2b_bn_b loaded from weights file into gpu_0/res4_5_branch2b_bn_b: (256,)
+INFO net.py:  96: res4_5_branch2c_w [+ momentum] loaded from weights file into gpu_0/res4_5_branch2c_w: (1024, 256, 1, 1)
+INFO net.py:  96: res4_5_branch2c_bn_s loaded from weights file into gpu_0/res4_5_branch2c_bn_s: (1024,)
+INFO net.py:  96: res4_5_branch2c_bn_b loaded from weights file into gpu_0/res4_5_branch2c_bn_b: (1024,)
+INFO net.py:  96: res5_0_branch2a_w [+ momentum] loaded from weights file into gpu_0/res5_0_branch2a_w: (512, 1024, 1, 1)
+INFO net.py:  96: res5_0_branch2a_bn_s loaded from weights file into gpu_0/res5_0_branch2a_bn_s: (512,)
+INFO net.py:  96: res5_0_branch2a_bn_b loaded from weights file into gpu_0/res5_0_branch2a_bn_b: (512,)
+INFO net.py:  96: res5_0_branch2b_w [+ momentum] loaded from weights file into gpu_0/res5_0_branch2b_w: (512, 512, 3, 3)
+INFO net.py:  96: res5_0_branch2b_bn_s loaded from weights file into gpu_0/res5_0_branch2b_bn_s: (512,)
+INFO net.py:  96: res5_0_branch2b_bn_b loaded from weights file into gpu_0/res5_0_branch2b_bn_b: (512,)
+INFO net.py:  96: res5_0_branch2c_w [+ momentum] loaded from weights file into gpu_0/res5_0_branch2c_w: (2048, 512, 1, 1)
+INFO net.py:  96: res5_0_branch2c_bn_s loaded from weights file into gpu_0/res5_0_branch2c_bn_s: (2048,)
+INFO net.py:  96: res5_0_branch2c_bn_b loaded from weights file into gpu_0/res5_0_branch2c_bn_b: (2048,)
+INFO net.py:  96: res5_0_branch1_w [+ momentum] loaded from weights file into gpu_0/res5_0_branch1_w: (2048, 1024, 1, 1)
+INFO net.py:  96: res5_0_branch1_bn_s loaded from weights file into gpu_0/res5_0_branch1_bn_s: (2048,)
+INFO net.py:  96: res5_0_branch1_bn_b loaded from weights file into gpu_0/res5_0_branch1_bn_b: (2048,)
+INFO net.py:  96: res5_1_branch2a_w [+ momentum] loaded from weights file into gpu_0/res5_1_branch2a_w: (512, 2048, 1, 1)
+INFO net.py:  96: res5_1_branch2a_bn_s loaded from weights file into gpu_0/res5_1_branch2a_bn_s: (512,)
+INFO net.py:  96: res5_1_branch2a_bn_b loaded from weights file into gpu_0/res5_1_branch2a_bn_b: (512,)
+INFO net.py:  96: res5_1_branch2b_w [+ momentum] loaded from weights file into gpu_0/res5_1_branch2b_w: (512, 512, 3, 3)
+INFO net.py:  96: res5_1_branch2b_bn_s loaded from weights file into gpu_0/res5_1_branch2b_bn_s: (512,)
+INFO net.py:  96: res5_1_branch2b_bn_b loaded from weights file into gpu_0/res5_1_branch2b_bn_b: (512,)
+INFO net.py:  96: res5_1_branch2c_w [+ momentum] loaded from weights file into gpu_0/res5_1_branch2c_w: (2048, 512, 1, 1)
+INFO net.py:  96: res5_1_branch2c_bn_s loaded from weights file into gpu_0/res5_1_branch2c_bn_s: (2048,)
+INFO net.py:  96: res5_1_branch2c_bn_b loaded from weights file into gpu_0/res5_1_branch2c_bn_b: (2048,)
+INFO net.py:  96: res5_2_branch2a_w [+ momentum] loaded from weights file into gpu_0/res5_2_branch2a_w: (512, 2048, 1, 1)
+INFO net.py:  96: res5_2_branch2a_bn_s loaded from weights file into gpu_0/res5_2_branch2a_bn_s: (512,)
+INFO net.py:  96: res5_2_branch2a_bn_b loaded from weights file into gpu_0/res5_2_branch2a_bn_b: (512,)
+INFO net.py:  96: res5_2_branch2b_w [+ momentum] loaded from weights file into gpu_0/res5_2_branch2b_w: (512, 512, 3, 3)
+INFO net.py:  96: res5_2_branch2b_bn_s loaded from weights file into gpu_0/res5_2_branch2b_bn_s: (512,)
+INFO net.py:  96: res5_2_branch2b_bn_b loaded from weights file into gpu_0/res5_2_branch2b_bn_b: (512,)
+INFO net.py:  96: res5_2_branch2c_w [+ momentum] loaded from weights file into gpu_0/res5_2_branch2c_w: (2048, 512, 1, 1)
+INFO net.py:  96: res5_2_branch2c_bn_s loaded from weights file into gpu_0/res5_2_branch2c_bn_s: (2048,)
+INFO net.py:  96: res5_2_branch2c_bn_b loaded from weights file into gpu_0/res5_2_branch2c_bn_b: (2048,)
+INFO net.py:  96: fpn_inner_res5_2_sum_w [+ momentum] loaded from weights file into gpu_0/fpn_inner_res5_2_sum_w: (256, 2048, 1, 1)
+INFO net.py:  96: fpn_inner_res5_2_sum_b [+ momentum] loaded from weights file into gpu_0/fpn_inner_res5_2_sum_b: (256,)
+INFO net.py:  96: fpn_inner_res4_5_sum_lateral_w [+ momentum] loaded from weights file into gpu_0/fpn_inner_res4_5_sum_lateral_w: (256, 1024, 1, 1)
+INFO net.py:  96: fpn_inner_res4_5_sum_lateral_b [+ momentum] loaded from weights file into gpu_0/fpn_inner_res4_5_sum_lateral_b: (256,)
+INFO net.py:  96: fpn_inner_res3_3_sum_lateral_w [+ momentum] loaded from weights file into gpu_0/fpn_inner_res3_3_sum_lateral_w: (256, 512, 1, 1)
+INFO net.py:  96: fpn_inner_res3_3_sum_lateral_b [+ momentum] loaded from weights file into gpu_0/fpn_inner_res3_3_sum_lateral_b: (256,)
+INFO net.py:  96: fpn_res5_2_sum_w [+ momentum] loaded from weights file into gpu_0/fpn_res5_2_sum_w: (256, 256, 3, 3)
+INFO net.py:  96: fpn_res5_2_sum_b [+ momentum] loaded from weights file into gpu_0/fpn_res5_2_sum_b: (256,)
+INFO net.py:  96: fpn_res4_5_sum_w [+ momentum] loaded from weights file into gpu_0/fpn_res4_5_sum_w: (256, 256, 3, 3)
+INFO net.py:  96: fpn_res4_5_sum_b [+ momentum] loaded from weights file into gpu_0/fpn_res4_5_sum_b: (256,)
+INFO net.py:  96: fpn_res3_3_sum_w [+ momentum] loaded from weights file into gpu_0/fpn_res3_3_sum_w: (256, 256, 3, 3)
+INFO net.py:  96: fpn_res3_3_sum_b [+ momentum] loaded from weights file into gpu_0/fpn_res3_3_sum_b: (256,)
+INFO net.py:  96: fpn_6_w [+ momentum] loaded from weights file into gpu_0/fpn_6_w: (256, 2048, 3, 3)
+INFO net.py:  96: fpn_6_b [+ momentum] loaded from weights file into gpu_0/fpn_6_b: (256,)
+INFO net.py:  96: fpn_7_w [+ momentum] loaded from weights file into gpu_0/fpn_7_w: (256, 256, 3, 3)
+INFO net.py:  96: fpn_7_b [+ momentum] loaded from weights file into gpu_0/fpn_7_b: (256,)
+INFO net.py:  96: retnet_cls_conv_n0_fpn3_w [+ momentum] loaded from weights file into gpu_0/retnet_cls_conv_n0_fpn3_w: (256, 256, 3, 3)
+INFO net.py:  96: retnet_cls_conv_n0_fpn3_b [+ momentum] loaded from weights file into gpu_0/retnet_cls_conv_n0_fpn3_b: (256,)
+INFO net.py:  96: retnet_cls_conv_n1_fpn3_w [+ momentum] loaded from weights file into gpu_0/retnet_cls_conv_n1_fpn3_w: (256, 256, 3, 3)
+INFO net.py:  96: retnet_cls_conv_n1_fpn3_b [+ momentum] loaded from weights file into gpu_0/retnet_cls_conv_n1_fpn3_b: (256,)
+INFO net.py:  96: retnet_cls_conv_n2_fpn3_w [+ momentum] loaded from weights file into gpu_0/retnet_cls_conv_n2_fpn3_w: (256, 256, 3, 3)
+INFO net.py:  96: retnet_cls_conv_n2_fpn3_b [+ momentum] loaded from weights file into gpu_0/retnet_cls_conv_n2_fpn3_b: (256,)
+INFO net.py:  96: retnet_cls_conv_n3_fpn3_w [+ momentum] loaded from weights file into gpu_0/retnet_cls_conv_n3_fpn3_w: (256, 256, 3, 3)
+INFO net.py:  96: retnet_cls_conv_n3_fpn3_b [+ momentum] loaded from weights file into gpu_0/retnet_cls_conv_n3_fpn3_b: (256,)
+INFO net.py:  96: retnet_cls_pred_fpn3_w [+ momentum] loaded from weights file into gpu_0/retnet_cls_pred_fpn3_w: (5409, 256, 3, 3)
+INFO net.py:  96: retnet_cls_pred_fpn3_b [+ momentum] loaded from weights file into gpu_0/retnet_cls_pred_fpn3_b: (5409,)
+INFO net.py:  96: retnet_bbox_conv_n0_fpn3_w [+ momentum] loaded from weights file into gpu_0/retnet_bbox_conv_n0_fpn3_w: (256, 256, 3, 3)
+INFO net.py:  96: retnet_bbox_conv_n0_fpn3_b [+ momentum] loaded from weights file into gpu_0/retnet_bbox_conv_n0_fpn3_b: (256,)
+INFO net.py:  96: retnet_bbox_conv_n1_fpn3_w [+ momentum] loaded from weights file into gpu_0/retnet_bbox_conv_n1_fpn3_w: (256, 256, 3, 3)
+INFO net.py:  96: retnet_bbox_conv_n1_fpn3_b [+ momentum] loaded from weights file into gpu_0/retnet_bbox_conv_n1_fpn3_b: (256,)
+INFO net.py:  96: retnet_bbox_conv_n2_fpn3_w [+ momentum] loaded from weights file into gpu_0/retnet_bbox_conv_n2_fpn3_w: (256, 256, 3, 3)
+INFO net.py:  96: retnet_bbox_conv_n2_fpn3_b [+ momentum] loaded from weights file into gpu_0/retnet_bbox_conv_n2_fpn3_b: (256,)
+INFO net.py:  96: retnet_bbox_conv_n3_fpn3_w [+ momentum] loaded from weights file into gpu_0/retnet_bbox_conv_n3_fpn3_w: (256, 256, 3, 3)
+INFO net.py:  96: retnet_bbox_conv_n3_fpn3_b [+ momentum] loaded from weights file into gpu_0/retnet_bbox_conv_n3_fpn3_b: (256,)
+INFO net.py:  96: retnet_bbox_pred_fpn3_w [+ momentum] loaded from weights file into gpu_0/retnet_bbox_pred_fpn3_w: (36, 256, 3, 3)
+INFO net.py:  96: retnet_bbox_pred_fpn3_b [+ momentum] loaded from weights file into gpu_0/retnet_bbox_pred_fpn3_b: (36,)
+INFO net.py: 133: res3_1_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res3_1_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res4_0_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res2_2_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res5_2_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res3_3_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res4_4_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res4_3_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res2_1_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: conv1_b preserved in workspace (unused)
+INFO net.py: 133: fc1000_b preserved in workspace (unused)
+INFO net.py: 133: res3_2_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: fc1000_w preserved in workspace (unused)
+INFO net.py: 133: res4_3_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res4_5_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res2_2_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res4_5_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res2_1_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res5_0_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res3_2_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res4_1_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res4_0_branch1_b preserved in workspace (unused)
+INFO net.py: 133: res5_1_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res4_3_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res4_2_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res4_0_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res3_2_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res2_0_branch1_b preserved in workspace (unused)
+INFO net.py: 133: res2_2_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res2_1_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res5_0_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res3_0_branch1_b preserved in workspace (unused)
+INFO net.py: 133: res3_1_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res5_2_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res5_0_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res2_0_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res4_1_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res4_0_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res4_5_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res3_0_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res5_1_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res5_1_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res4_4_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res4_2_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res2_0_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res3_3_branch2b_b preserved in workspace (unused)
+INFO net.py: 133: res3_3_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res4_2_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res2_0_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res4_4_branch2c_b preserved in workspace (unused)
+INFO net.py: 133: res5_2_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res4_1_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res3_0_branch2a_b preserved in workspace (unused)
+INFO net.py: 133: res5_0_branch1_b preserved in workspace (unused)
+INFO net.py: 133: res3_0_branch2c_b preserved in workspace (unused)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 1/41620 10.238s + 0.012s (eta: 4 days, 22:30:28)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 11/41620 2.426s + 0.012s (eta: 1 day, 4:10:53)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 21/41620 1.570s + 0.012s (eta: 18:16:45)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 31/41620 1.248s + 0.012s (eta: 14:33:30)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 41/41620 1.099s + 0.012s (eta: 12:49:57)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 51/41620 1.038s + 0.012s (eta: 12:07:21)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 61/41620 0.976s + 0.012s (eta: 11:24:16)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 71/41620 0.927s + 0.012s (eta: 10:50:24)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 81/41620 0.885s + 0.012s (eta: 10:20:37)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 91/41620 0.856s + 0.012s (eta: 10:00:34)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 101/41620 0.833s + 0.012s (eta: 9:44:31)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 111/41620 0.808s + 0.012s (eta: 9:27:23)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 121/41620 0.794s + 0.012s (eta: 9:17:34)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 131/41620 0.781s + 0.012s (eta: 9:08:13)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 141/41620 0.768s + 0.012s (eta: 8:59:14)
+INFO test_engine.py: 286: im_detect: range [1, 41620] of 41620: 151/41620 0.759s + 0.012s (eta: 8:53:10)
