@@ -62,6 +62,7 @@ class JsonDataset(object):
         self.name = name
         self.image_directory = dataset_catalog.get_im_dir(name)
         self.image_prefix = dataset_catalog.get_im_prefix(name)
+        print ("================= loading annotation {}".format(name))
         self.COCO = COCO(dataset_catalog.get_ann_fn(name))
         self.debug_timer = Timer()
         # Set up dataset classes
@@ -99,6 +100,7 @@ class JsonDataset(object):
             'are not included.'
         image_ids = self.COCO.getImgIds()
         image_ids.sort()
+        print ("getting roidb")
         roidb = copy.deepcopy(self.COCO.loadImgs(image_ids))
         for entry in roidb:
             self._prep_roidb_entry(entry)

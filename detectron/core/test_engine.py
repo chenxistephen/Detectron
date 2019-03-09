@@ -21,6 +21,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from collections import defaultdict
+from collections import OrderedDict
 import cv2
 import datetime
 import logging
@@ -142,13 +143,38 @@ def test_net_on_dataset(
     proposal_file,
     output_dir,
     multi_gpu=False,
-    gpu_id=0
+    gpu_id=0, 
+    test_only=True
 ):
     """Run inference on a dataset."""
     dataset = JsonDataset(dataset_name)
     test_timer = Timer()
     test_timer.tic()
-    if multi_gpu:
+    ################################################################
+    import pickle
+    res_file = os.path.join(
+        output_dir, 'bbox_' + dataset_name + '_results.json'
+    )
+    print ("res_file = {}==========================".format(res_file))
+    if os.path.exists(res_file):
+        import detectron.datasets.json_dataset_evaluator as json_dataset_evaluator
+        print ("res_file = {} exists! Loading res_file".format(res_file))
+        coco_eval = json_dataset_evaluator._do_detection_eval(dataset, res_file, output_dir)
+        box_results = task_evaluation._coco_eval_to_box_results(coco_eval)
+        results = OrderedDict([(dataset.name, box_results)])
+        return results     
+    ################################################################
+    det_name = "detections.pkl"
+    det_file = os.path.join(output_dir, det_name)
+    print ("det_file = {}==========================".format(det_file))
+    if os.path.exists(det_file):
+        print ("{} exists! Loading detection results".format(det_file))
+        res = pickle.load(open(det_file, 'rb'))
+        all_boxes = res['all_boxes']
+        all_segms = res['all_segms']
+        all_keyps = res['all_keyps']
+    ################################################################
+    elif multi_gpu:
         num_images = len(dataset.get_roidb())
         all_boxes, all_segms, all_keyps = multi_gpu_test_net_on_dataset(
             weights_file, dataset_name, proposal_file, num_images, output_dir
@@ -159,9 +185,12 @@ def test_net_on_dataset(
         )
     test_timer.toc()
     logger.info('Total inference time: {:.3f}s'.format(test_timer.average_time))
-    results = task_evaluation.evaluate_all(
-        dataset, all_boxes, all_segms, all_keyps, output_dir
-    )
+    if test_only:
+        return OrderedDict([(dataset.name, all_boxes)])
+    else:
+        results = task_evaluation.evaluate_all(
+            dataset, all_boxes, all_segms, all_keyps, output_dir
+        )
     return results
 
 
@@ -169,6 +198,8 @@ def multi_gpu_test_net_on_dataset(
     weights_file, dataset_name, proposal_file, num_images, output_dir
 ):
     """Multi-gpu inference on a dataset."""
+    print ("""Multi-gpu inference on a dataset.""")
+    print ("num_images = {}".format(num_images))
     binary_dir = envu.get_runtime_dir()
     binary_ext = envu.get_py_bin_ext()
     binary = os.path.join(binary_dir, 'test_net' + binary_ext)
@@ -179,7 +210,7 @@ def multi_gpu_test_net_on_dataset(
     opts += ['TEST.WEIGHTS', weights_file]
     if proposal_file:
         opts += ['TEST.PROPOSAL_FILES', '("{}",)'.format(proposal_file)]
-
+    print (opts)
     # Run inference in parallel in subprocesses
     # Outputs will be a list of outputs from each subprocess, where the output
     # of each subprocess is the dictionary saved by test_net().
@@ -252,6 +283,7 @@ def test_net(
             box_proposals = None
 
         im = cv2.imread(entry['image'])
+        #print(entry['image'])
         with c2_utils.NamedCudaScope(gpu_id):
             cls_boxes_i, cls_segms_i, cls_keyps_i = im_detect_all(
                 model, im, box_proposals, timers
@@ -288,6 +320,7 @@ def test_net(
             )
 
         if cfg.VIS:
+            print (os.path.join(output_dir, 'vis'))
             im_name = os.path.splitext(os.path.basename(entry['image']))[0]
             vis_utils.vis_one_image(
                 im[:, :, ::-1],
@@ -343,6 +376,7 @@ def get_roidb_and_dataset(dataset_name, proposal_file, ind_range):
     restrict it to a range of indices if ind_range is a pair of integers.
     """
     dataset = JsonDataset(dataset_name)
+    print ("--------------- Getting ROIDB for dataset: {} --------------------".format(dataset_name))
     if cfg.TEST.PRECOMPUTED_PROPOSALS:
         assert proposal_file, 'No proposal file given'
         roidb = dataset.get_roidb(

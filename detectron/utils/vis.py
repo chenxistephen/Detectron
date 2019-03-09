@@ -253,7 +253,7 @@ def vis_one_image_opencv(
 def vis_one_image(
         im, im_name, output_dir, boxes, segms=None, keypoints=None, thresh=0.9,
         kp_thresh=2, dpi=200, box_alpha=0.0, dataset=None, show_class=False,
-        ext='pdf', out_when_no_box=False):
+        ext='pdf', out_when_no_box=False,classes_list=None):
     """Visual debugging of detections."""
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -303,12 +303,16 @@ def vis_one_image(
                           bbox[2] - bbox[0],
                           bbox[3] - bbox[1],
                           fill=False, edgecolor='g',
-                          linewidth=0.5, alpha=box_alpha))
+                          linewidth=1, alpha=box_alpha))
 
         if show_class:
+            if classes_list is not None:
+                class_str = '{}:{:.2f}'.format(classes_list[classes[i]], score)
+            else:
+                class_str = get_class_string(classes[i], score, dataset)
             ax.text(
                 bbox[0], bbox[1] - 2,
-                get_class_string(classes[i], score, dataset),
+                class_str,
                 fontsize=3,
                 family='serif',
                 bbox=dict(

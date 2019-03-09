@@ -82,6 +82,9 @@ def parse_args():
 
 def vis(dataset, detections_pkl, thresh, output_dir, limit=0):
     ds = JsonDataset(dataset)
+    classes_list = [l.rstrip() for l in open('/home/chnxi/data/HomeFurniture/taxonomy/furniture_58_labels.txt','r').readlines()]
+    classes_list = ['background'] + classes_list
+    print (classes_list)
     roidb = ds.get_roidb()
 
     dets = load_object(detections_pkl)
@@ -128,7 +131,9 @@ def vis(dataset, detections_pkl, thresh, output_dir, limit=0):
             thresh=thresh,
             box_alpha=0.8,
             dataset=ds,
-            show_class=True
+            show_class=True, 
+            ext='.png', 
+            classes_list=classes_list
         )
 
 

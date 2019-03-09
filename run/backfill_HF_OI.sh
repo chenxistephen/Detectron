@@ -4,18 +4,18 @@ set -eu
 TESTATT=OpenImage_train # $2 #furniture_val_SearchIntent
 GPUS=$1
 SCALE=600 #$7 # TEST SCALE
-
+NUM_GPU=$2
 
 #MODEL_NAME=scale"$TRAINSCALE"_iter90000_alpha"$ALPHA"_gamma"$GAMMA"_lr"$LR"_body"$BODY"
 
 
 
 CUDA_VISIBLE_DEVICES="$GPUS" python tools/test_net.py \
-    --cfg configs/OpenImage/retinanet_1gpu_R-50-FPN_1x.yaml \
-    TEST.WEIGHTS Trained_Models/HomeFurniture/V1_Shipping/model_final.pkl \
-    OUTPUT_DIR backfill/HF_Detector/OpenImage/ \
-    TEST.DATASETS "('$TESTATT',)" \
+    --cfg configs/HomeFurniture/hf_fashion_vi_retinanet.yaml \
     --multi-gpu-testing \
-    NUM_GPUS 4 \
+    TEST.WEIGHTS Trained_Models/HomeFurniture/V1_Shipping/model_final.pkl \
+    OUTPUT_DIR backfill/HF_Detector/$TESTATT/ \
+    TEST.DATASETS "('$TESTATT',)" \
+    NUM_GPUS $2 \
     TEST.SCALE $SCALE \
     | tee logs/run_HF_on_$TESTATT.log

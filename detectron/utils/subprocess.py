@@ -53,14 +53,18 @@ def process_in_parallel(
     subinds = np.array_split(range(total_range_size), cfg.NUM_GPUS)
     # Determine GPUs to use
     cuda_visible_devices = os.environ.get('CUDA_VISIBLE_DEVICES')
+    print (" ******************* cuda_visible_devices= {}".format(cuda_visible_devices))
     if cuda_visible_devices:
-        gpu_inds = map(int, cuda_visible_devices.split(','))
+        gpu_inds = [int(g) for g in cuda_visible_devices.strip().split(',')]#map(int, cuda_visible_devices.split(','))
+        print (gpu_inds)
         assert -1 not in gpu_inds, \
             'Hiding GPU indices using the \'-1\' index is not supported'
     else:
         gpu_inds = range(cfg.NUM_GPUS)
+    print("#gpu_inds: {}".format(len(list(gpu_inds))))
     # Run the binary in cfg.NUM_GPUS subprocesses
     for i, gpu_ind in enumerate(gpu_inds):
+        print("==================== current gpu_ind = {}".format(gpu_ind))
         start = subinds[i][0]
         end = subinds[i][-1] + 1
         subprocess_env['CUDA_VISIBLE_DEVICES'] = str(gpu_ind)
