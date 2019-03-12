@@ -142,25 +142,25 @@ _DATASETS = {
     },
     'coco_2014_train': {
         _IM_DIR:
-            _DATA_DIR + '/coco/coco_train2014',
+            _DATA_DIR + '/coco/train2014',
         _ANN_FN:
             _DATA_DIR + '/coco/annotations/instances_train2014.json'
     },
     'coco_2014_val': {
         _IM_DIR:
-            _DATA_DIR + '/coco/coco_val2014',
+            _DATA_DIR + '/coco/val2014',
         _ANN_FN:
             _DATA_DIR + '/coco/annotations/instances_val2014.json'
     },
     'coco_2014_minival': {
         _IM_DIR:
-            _DATA_DIR + '/coco/coco_val2014',
+            _DATA_DIR + '/coco/val2014',
         _ANN_FN:
             _DATA_DIR + '/coco/annotations/instances_minival2014.json'
     },
     'coco_2014_valminusminival': {
         _IM_DIR:
-            _DATA_DIR + '/coco/coco_val2014',
+            _DATA_DIR + '/coco/val2014',
         _ANN_FN:
             _DATA_DIR + '/coco/annotations/instances_valminusminival2014.json'
     },

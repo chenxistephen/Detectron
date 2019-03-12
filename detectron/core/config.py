@@ -1144,6 +1144,7 @@ def merge_cfg_from_list(cfg_list):
     """Merge config keys, values in a list (e.g., from command line) into the
     global config. For example, `cfg_list = ['TEST.NMS', 0.5]`.
     """
+    print ("cfg_list = {}".format(cfg_list))
     assert len(cfg_list) % 2 == 0
     for full_key, v in zip(cfg_list[0::2], cfg_list[1::2]):
         if _key_is_deprecated(full_key):
