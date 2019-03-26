@@ -86,6 +86,7 @@ def run_inference(
     weights_file, ind_range=None,
     multi_gpu_testing=False, gpu_id=0,
     check_expected_results=False,
+    test_only=True
 ):
     parent_func, child_func = get_eval_functions()
     is_parent = ind_range is None
@@ -105,7 +106,8 @@ def run_inference(
                     dataset_name,
                     proposal_file,
                     output_dir,
-                    multi_gpu=multi_gpu_testing
+                    multi_gpu=multi_gpu_testing,
+                    test_only=test_only
                 )
                 all_results.update(results)
 
