@@ -98,6 +98,8 @@ class JsonDataset(object):
         assert gt is True or crowd_filter_thresh == 0, \
             'Crowd filter threshold must be 0 if ground-truth annotations ' \
             'are not included.'
+        roidb_timer = Timer()
+        roidb_timer.tic()
         image_ids = self.COCO.getImgIds()
         image_ids.sort()
         print ("getting roidb")
@@ -125,6 +127,7 @@ class JsonDataset(object):
                 format(self.debug_timer.toc(average=False))
             )
         _add_class_assignments(roidb)
+        print('Done (t={:0.2f}s)'.format(roidb_timer.toc(average=False)))
         return roidb
 
     def _prep_roidb_entry(self, entry):
