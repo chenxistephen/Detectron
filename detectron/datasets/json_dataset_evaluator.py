@@ -187,7 +187,6 @@ def _coco_bbox_results_one_category(json_dataset, boxes, cat_id):
     results = []
     image_ids = json_dataset.COCO.getImgIds()
     image_ids.sort()
-    print ("len(boxes) = {}, len(image_ids) = {}".format(len(boxes), len(image_ids)))
     assert len(boxes) == len(image_ids)
     for i, image_id in enumerate(image_ids):
         dets = boxes[i]
@@ -213,10 +212,13 @@ def _do_detection_eval(json_dataset, res_file, output_dir):
     coco_eval = COCOeval(json_dataset.COCO, coco_dt, 'bbox')
     coco_eval.evaluate()
     coco_eval.accumulate()
-    _log_detection_eval_metrics(json_dataset, coco_eval)
+    clsPRs = _log_detection_eval_metrics(json_dataset, coco_eval)
     eval_file = os.path.join(output_dir, 'detection_results.pkl')
+    cls_pr_file = os.path.join(output_dir, 'classwise_pr_curves.pkl')
     save_object(coco_eval, eval_file)
+    save_object(clsPRs, cls_pr_file)
     logger.info('Wrote json eval results to: {}'.format(eval_file))
+    logger.info('Wrote classwise PR results to: {}'.format(cls_pr_file))
     return coco_eval
 
 
@@ -237,6 +239,11 @@ def _log_detection_eval_metrics(json_dataset, coco_eval):
     # max dets index 2: 100 per image
     precision = coco_eval.eval['precision'][ind_lo:(ind_hi + 1), :, :, 0, 2]
     ap_default = np.mean(precision[precision > -1])
+    ########################################################################
+    ### Logging classwise PR curves
+    recallThrs = coco_eval.params.recThrs
+    clsPrecisions = []
+    ########################################################################
     logger.info(
         '~~~~ Mean and per-category AP @ IoU=[{:.2f},{:.2f}] ~~~~'.format(
             IoU_lo_thresh, IoU_hi_thresh))
@@ -247,10 +254,24 @@ def _log_detection_eval_metrics(json_dataset, coco_eval):
         # minus 1 because of __background__
         precision = coco_eval.eval['precision'][
             ind_lo:(ind_hi + 1), :, cls_ind - 1, 0, 2]
+        ########################################################################
+        ### Logging classwise PR curves
+        cls_precision = coco_eval.eval['precision'][
+            ind_lo, :, cls_ind - 1, 0, 2]
+        clsPrecisions.append(cls_precision)
+        ########################################################################
         ap = np.mean(precision[precision > -1])
         logger.info('{:.1f}'.format(100 * ap))
     logger.info('~~~~ Summary metrics ~~~~')
     coco_eval.summarize()
+    ########################################################################
+    ### Logging classwise PR curves
+    clsPrecisions = np.stack(clsPrecisions, axis=0)
+    clsPRs = {'recallThrs':recallThrs, 
+              'clsPrecisions':clsPrecisions
+             }
+    return clsPRs
+    ########################################################################
 
 
 def evaluate_box_proposals(
