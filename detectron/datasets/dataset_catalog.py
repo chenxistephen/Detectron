@@ -37,6 +37,12 @@ _RAW_DIR = 'raw_dir'
 
 # Available datasets
 _DATASETS = {
+    'GOD_train': {
+        _IM_DIR:
+            '/media/data/chnxi/',
+        _ANN_FN:
+            '/media/data/chnxi/GOD/json_annotations/GOD_train_annotations.json'
+    },
     'HF_Fashion_VI_train': {
         _IM_DIR:
             _DATA_DIR + '/',
