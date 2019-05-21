@@ -125,6 +125,7 @@ def test_model(model_file, multi_gpu_testing, opts=None):
     run_inference(
         model_file, multi_gpu_testing=multi_gpu_testing,
         check_expected_results=True,
+        test_only=False
     )
 
 
