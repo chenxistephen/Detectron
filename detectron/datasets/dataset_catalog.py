@@ -67,6 +67,18 @@ _DATASETS = {
         _ANN_FN:
             _DATA_DIR + '/OpenImage/json_annotations/validation_annotations.json'
     }, 
+    'FashionV2_train': {
+        _IM_DIR:
+            _DATA_DIR + '/FashionV2/Images',
+        _ANN_FN:
+            _DATA_DIR + '/FashionV2/json_annotations/train_annotations.json'
+    },
+    'FashionV2_val': {
+        _IM_DIR:
+            _DATA_DIR + '/FashionV2/Images',
+        _ANN_FN:
+            _DATA_DIR + '/FashionV2/json_annotations/val_annotations.json'
+    },
     'logo_1048_train': {
         _IM_DIR:
             _DATA_DIR + '/Logo/Images',
