@@ -16,7 +16,7 @@ echo $MODEL_NAME
 
 
 CUDA_VISIBLE_DEVICES="$GPUS" python tools/test_net.py \
-    --cfg configs/GOD/e2e_faster_rcnn_R-50-FPN_1x.yaml \
+    --cfg configs/GOD/e2e_faster_rcnn_R-50-FPN_8gpu.yaml \
     --eval_test \
     TEST.WEIGHTS $MODEL_PATH/$MODEL_NAME/model_final.pkl \
     OUTPUT_DIR $MODEL_PATH/$MODEL_NAME/test/Test_$SCALE \
