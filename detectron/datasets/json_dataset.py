@@ -71,6 +71,18 @@ class JsonDataset(object):
         self.category_to_id_map = dict(zip(categories, category_ids))
         self.classes = ['__background__'] + categories
         self.num_classes = len(self.classes)
+        
+        ##############################################################################
+        # Stephen: add subset_categories
+        if 'subset_categories' in self.COCO.dataset:
+            self.subset_categories = [c['name'] for c in self.COCO.dataset['subset_categories']]
+            self.subset_category_ids = [c['id'] for c in self.COCO.dataset['subset_categories']]
+        else:
+            self.subset_categories = None
+            self.subset_category_ids = None
+        print ("self.subset_categories = {}".format(self.subset_categories))
+        ##############################################################################
+        
         self.json_category_id_to_contiguous_id = {
             v: i + 1
             for i, v in enumerate(self.COCO.getCatIds())

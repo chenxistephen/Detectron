@@ -40,7 +40,7 @@ god_classes = ['__background__'] + god_classes
 
 #############   Creating Data   ################################################# 
 #####  Creating one json for 4 datasets
-mergedDataset = 'GOD_{}'.format(sampleSize) if sampleSize is not None else 'GOD'
+mergedDataset = 'GOD_AML_{}'.format(sampleSize) if sampleSize is not None else 'GOD_AML'
 outAnnoFolder = '/media/data/chnxi/GOD/json_annotations/'
 checkMkdir(outAnnoFolder)
 outAnnoFile = osp.join(outAnnoFolder, '{}_train_annotations.json'.format(mergedDataset))
@@ -86,7 +86,7 @@ for dataset in datasetList:
                     'OpenImage_Detector': 'FashionV2_train.pkl'}
     elif dataset == 'OpenImage_train':
         gtSetName = 'Open Image'
-        imgPath = 'OpenImage/train_images.zip@/train_images/'
+        imgPath = 'OpenImage/train_images/'
         mapFile = mapFilePath + 'OpenImage_dataset_sources_ids.pkl'
         srcFiles = {'Fashion_Detector'  : 'OpenImage_train.json',
                     'HF_Detector'       : 'OpenImage_train.pkl',

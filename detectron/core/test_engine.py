@@ -128,12 +128,13 @@ def run_inference(
             )
 
     all_results = result_getter()
+    import pdb; pdb.set_trace()
     if check_expected_results and is_parent:
         task_evaluation.check_expected_results(
             all_results,
             atol=cfg.EXPECTED_RESULTS_ATOL,
             rtol=cfg.EXPECTED_RESULTS_RTOL
-        )
+        )        
         task_evaluation.log_copy_paste_friendly_results(all_results)
 
     return all_results
