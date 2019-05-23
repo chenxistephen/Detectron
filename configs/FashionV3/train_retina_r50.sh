@@ -4,6 +4,6 @@ GPUS=$1
 
 CUDA_VISIBLE_DEVICES="$GPUS" python tools/train_net.py \
     --multi-gpu-testing \
-    --cfg configs/GOD/e2e_faster_rcnn_R-50-FPN_1x.yaml \
+    --cfg configs/FashionV3/fashion_vi_110_retinanet.yaml \
     OUTPUT_DIR ./detectron-output \
     USE_NCCL True

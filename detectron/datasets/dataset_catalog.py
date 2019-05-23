@@ -39,11 +39,17 @@ _GOD_DATA_DIR = '/media/data/chnxi/GOD/'
 
 # Available datasets
 _DATASETS = {
+    'Fashion_VI_train': {
+        _IM_DIR:
+            _DATA_DIR + '/',
+        _ANN_FN:
+            _DATA_DIR + '/Fashion_VI_detectron/json_annotations/Fashion_VI_All_annotations_train.json'
+    },
     'GOD_train': {
         _IM_DIR:
-            '/media/data/chnxi/',
+            '/data/chnxi/',
         _ANN_FN:
-            '/media/data/chnxi/GOD/json_annotations/GOD_train_annotations.json'
+            '/data/chnxi/GOD/json_annotations/GOD_train_annotations.json'
     },
     'GOD_FashionV2_val': {
         _IM_DIR:
@@ -99,7 +105,13 @@ _DATASETS = {
             _DATA_DIR + '/OpenImage/validation_images',
         _ANN_FN:
             _DATA_DIR + '/OpenImage/json_annotations/validation_annotations.json'
-    }, 
+    },
+    'Fashion_VI_train': {
+        _IM_DIR:
+            _DATA_DIR + '/',
+        _ANN_FN:
+            _DATA_DIR + '/FashionV2/json_annotations/Fashion_VI_All_annotations_train.json'
+    },
     'FashionV2_train': {
         _IM_DIR:
             _DATA_DIR + '/FashionV2/Images',
