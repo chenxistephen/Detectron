@@ -93,9 +93,12 @@ def main():
     logging.getLogger('detectron.roi_data.loader').setLevel(logging.INFO)
     args = parse_args()
     logger.info('Called with args:')
-    logger.info(args)
+    logger.info(args)    
     if args.cfg_file is not None:
         merge_cfg_from_file(args.cfg_file)
+        
+    org_iter = cfg['SOLVER']['MAX_ITER']
+        
     if args.opts is not None:
         merge_cfg_from_list(args.opts)
     assert_and_infer_cfg()
@@ -103,6 +106,16 @@ def main():
     logger.info("cuda version : {}".format(cuda_ver))
     logger.info("cudnn version: {}".format(cudnn_ver))
     logger.info("nvidia-smi output:\n{}".format(smi_output))
+    print ("################################################################################################")
+    xtime = cfg['SOLVER']['MAX_ITER'] / org_iter
+    if xtime != 1:
+        cfg['SOLVER']['STEPS'] = [int(s * xtime) for s in cfg['SOLVER']['STEPS']]
+    print ("cfg['SOLVER']['MAX_ITER'] = {}".format(cfg['SOLVER']['MAX_ITER']))
+    print ("Original Iters = {}, X time = {}".format(org_iter, xtime))
+    print ("cfg['SOLVER']['STEPS'] = {}".format(cfg['SOLVER']['STEPS']))
+    print ("cfg['SOLVER']['BASE_LR'] = {}".format(cfg['SOLVER']['BASE_LR']))
+    print ("cfg['TRAIN']['IMS_PER_BATCH'] = {}".format(cfg['TRAIN']['IMS_PER_BATCH']))
+    print ("################################################################################################")
     logger.info('Training with config:')
     logger.info(pprint.pformat(cfg))
     # Note that while we set the numpy random seed network training will not be
