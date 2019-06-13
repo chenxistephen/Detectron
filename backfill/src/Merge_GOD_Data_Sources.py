@@ -14,6 +14,10 @@ def checkMkdir(dirname):
     if not osp.isdir(dirname):
         os.makedirs(dirname)
         
+sampleSize = int(sys.argv[1]) if len(sys.argv) > 1 else None
+
+print ("sampleSize = {}".format(sampleSize))
+        
 boxFilePath = '/media/data/chnxi/GOD/threshold_bboxes/'
 mapFilePath = '/media/data/chnxi/GOD/mappings/src_nameid_to_GOD_id_mappings/'
 
@@ -36,10 +40,11 @@ god_classes = ['__background__'] + god_classes
 
 #############   Creating Data   ################################################# 
 #####  Creating one json for 4 datasets
-mergedDataset = 'GOD'
-outAnnoFolder = '/media/data/chnxi/GOD/json_annotatinos/'
+mergedDataset = 'GOD_AML_{}'.format(sampleSize) if sampleSize is not None else 'GOD_AML'
+outAnnoFolder = '/media/data/chnxi/GOD/json_annotations/'
 checkMkdir(outAnnoFolder)
 outAnnoFile = osp.join(outAnnoFolder, '{}_train_annotations.json'.format(mergedDataset))
+print ("outAnnoFile = {}".format(outAnnoFile))
 data = {}
 supercat = 'Generic'
 data['info'] = {'description':'Bing Generic Object Detection dataset on {}'.format(mergedDataset)}
@@ -81,7 +86,7 @@ for dataset in datasetList:
                     'OpenImage_Detector': 'FashionV2_train.pkl'}
     elif dataset == 'OpenImage_train':
         gtSetName = 'Open Image'
-        imgPath = 'OpenImage/train_images.zip@/train_images/'
+        imgPath = 'OpenImage/train_images/'
         mapFile = mapFilePath + 'OpenImage_dataset_sources_ids.pkl'
         srcFiles = {'Fashion_Detector'  : 'OpenImage_train.json',
                     'HF_Detector'       : 'OpenImage_train.pkl',
@@ -110,6 +115,8 @@ for dataset in datasetList:
             roidb = roidb + rdb
     imgNum = len(roidb)
     print ('imgNum = {}'.format(imgNum))
+    dbSampleNum = len(roidb[:sampleSize])
+    print ("sampling {} images from roidb {}".format(dbSampleNum, dataset))
     #################################################################################
 
     ### Loading ROIDB   #############################################################
@@ -179,8 +186,7 @@ for dataset in datasetList:
 
     ########### Getting bbox from 4 sources  ################################################
 
-
-    for imgid, entry in enumerate(roidb):
+    for imgid, entry in enumerate(roidb[:sampleSize]):
         # entry = roidb[imgid]
         ###############################################
         ## data['images']

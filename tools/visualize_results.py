@@ -56,7 +56,7 @@ def parse_args():
         '--thresh',
         dest='thresh',
         help='detection prob threshold',
-        default=0.9,
+        default=0.7,
         type=float
     )
     parser.add_argument(
@@ -82,8 +82,10 @@ def parse_args():
 
 def vis(dataset, detections_pkl, thresh, output_dir, limit=0):
     ds = JsonDataset(dataset)
-    classes_list = [l.rstrip() for l in open('/home/chnxi/data/HomeFurniture/taxonomy/furniture_58_labels.txt','r').readlines()]
+    #classes_list = [l.rstrip() for l in open('/home/chnxi/data/HomeFurniture/taxonomy/furniture_58_labels.txt','r').readlines()]
+    classes_list = [l.rstrip().split('\t')[0].split('\\')[-1] for l in open('/home/chnxi/GOD/taxonomy/GOD_taxonomy_V1.tsv','r').readlines()[1:]]
     classes_list = ['background'] + classes_list
+#     classes_list = ds.classes
     print (classes_list)
     roidb = ds.get_roidb()
 

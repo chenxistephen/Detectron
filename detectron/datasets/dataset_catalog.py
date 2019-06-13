@@ -35,6 +35,8 @@ _IM_PREFIX = 'image_prefix'
 _DEVKIT_DIR = 'devkit_directory'
 _RAW_DIR = 'raw_dir'
 
+_GOD_DATA_DIR = '/media/data/chnxi/GOD/'
+
 # Available datasets
 _DATASETS = {
     'Fashion_VI_train': {
@@ -49,6 +51,31 @@ _DATASETS = {
         _ANN_FN:
             '/data/chnxi/GOD/json_annotations/GOD_train_annotations.json'
     },
+    'GOD_FashionV2_val': {
+        _IM_DIR:
+            _DATA_DIR + '/FashionV2/Images',
+        _ANN_FN:
+            _GOD_DATA_DIR + '/json_annotations/val/FashionV2_val_annotations.json'
+    },
+    'GOD_furniture_val': {
+        _IM_DIR:
+            _DATA_DIR + '/HomeFurniture/Images',
+        _ANN_FN:
+            _GOD_DATA_DIR + '/json_annotations/val/HomeFurniture_val_annotations.json'
+    },
+    'GOD_OpenImage_val': {
+        _IM_DIR:
+            _DATA_DIR + '/OpenImage/validation_images',
+        _ANN_FN:
+            _GOD_DATA_DIR + '/json_annotations/val/OpenImage_val_annotations.json'
+    },
+    'GOD_coco_2014_minival': {
+        _IM_DIR:
+            _DATA_DIR + '/coco/val2014',
+        _ANN_FN:
+            _GOD_DATA_DIR + '/json_annotations/val/COCO_91_val_annotations.json'
+    },
+    
     'HF_Fashion_VI_train': {
         _IM_DIR:
             _DATA_DIR + '/',

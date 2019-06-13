@@ -14,7 +14,7 @@ CUDA_VISIBLE_DEVICES="$GPUS" python tools/test_net.py \
     --cfg configs/12_2017_baselines/e2e_faster_rcnn_X-101-64x4d-FPN_1x.yaml \
     --multi-gpu-testing \
     TEST.WEIGHTS Trained_Models/COCO_Models/Mask_X-101-64x4d-FPN/model_final.pkl \
-	    OUTPUT_DIR backfill/COCO_Mask_Detector/$TESTATT/ \
+    OUTPUT_DIR backfill/COCO_Mask_Detector/$TESTATT/ \
     TEST.DATASETS "('$TESTATT',)" \
     NUM_GPUS $2 \
     TEST.SCALE $SCALE \

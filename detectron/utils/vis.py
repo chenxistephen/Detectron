@@ -311,9 +311,9 @@ def vis_one_image(
             else:
                 class_str = get_class_string(classes[i], score, dataset)
             ax.text(
-                bbox[0], bbox[1] - 2,
+                bbox[0], bbox[1] + 10,
                 class_str,
-                fontsize=3,
+                fontsize=8,
                 family='serif',
                 bbox=dict(
                     facecolor='g', alpha=0.4, pad=0, edgecolor='none'),
