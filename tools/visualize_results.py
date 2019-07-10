@@ -53,6 +53,13 @@ def parse_args():
         type=str
     )
     parser.add_argument(
+        '--class_list_file',
+        dest='class_list_file',
+        help='class_list_file',
+        default=None,
+        type=str
+    )
+    parser.add_argument(
         '--thresh',
         dest='thresh',
         help='detection prob threshold',
@@ -73,23 +80,57 @@ def parse_args():
         default=0,
         type=int
     )
+    parser.add_argument(
+        '--sampleNum',
+        dest='sampleNum',
+        help='random sample image num',
+        default=None,
+        type=int,
+    )
+#     parser.add_argument(
+#         '--range',
+#         dest='range',
+#         help='start (inclusive) and end (exclusive) indices',
+#         default=None,
+#         type=int,
+#         nargs=2
+#     )
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
     args = parser.parse_args()
     return args
 
-
-def vis(dataset, detections_pkl, thresh, output_dir, limit=0):
+import numpy as np
+def vis(dataset, detections_pkl, thresh, output_dir, sampleNum=None, class_list_file=None):
     ds = JsonDataset(dataset)
     #classes_list = [l.rstrip() for l in open('/home/chnxi/data/HomeFurniture/taxonomy/furniture_58_labels.txt','r').readlines()]
-    classes_list = [l.rstrip().split('\t')[0].split('\\')[-1] for l in open('/home/chnxi/GOD/taxonomy/GOD_taxonomy_V1.tsv','r').readlines()[1:]]
+    if class_list_file is not None:
+        classes_list = [l.rstrip().split('\t')[0].split('\\')[-1] for l in open(class_list_file,'r').readlines()]
+    else:
+        classes_list = ds.classes
     classes_list = ['background'] + classes_list
-#     classes_list = ds.classes
+    
     print (classes_list)
     roidb = ds.get_roidb()
-
+    
+    if 'range' in detections_pkl:
+        pkl_range = osp.splitext(s)[0].split('range_')[-1].split('_')
+        pkl_range = [int(r) for r in id_range]
+    else:
+        pkl_range = [0, len(roidb)]
+        
+    pkl_img_ids = list(range(pkl_range[0], pkl_range[1]))
+    pklNum = len(pkl_img_ids)
+    
+    if sampleNum is not None:
+        ids_in_pkl = np.random.choice(pklNum, sampleNum)
+    else:
+        ids_in_pkl = list(range(pklNum))
+        
     dets = load_object(detections_pkl)
+    
+    print ("pkl_range = {}, sampleNum = {}, len(ids_in_pkl) = {}, len(roidb) = {}".format(pkl_range, sampleNum, len(ids_in_pkl), len(roidb)))
 
     assert all(k in dets for k in ['all_boxes', 'all_segms', 'all_keyps']), \
         'Expected detections pkl file in the format used by test_engine.py'
@@ -103,30 +144,32 @@ def vis(dataset, detections_pkl, thresh, output_dir, limit=0):
             return val
         else:
             return val[ix]
-
-    for ix, entry in enumerate(roidb):
-        if limit > 0 and ix >= limit:
-            break
-        if ix % 10 == 0:
-            print('{:d}/{:d}'.format(ix + 1, len(roidb)))
+        
+        
+    #for ix, entry in enumerate(roidb):
+    for ii, id_in_pkl in enumerate(ids_in_pkl):
+        img_id = pkl_img_ids[id_in_pkl]
+        entry = roidb[img_id]
+        if ii % 10 == 0:
+            print('{:d}/{:d}'.format(ii + 1, len(ids_in_pkl)))
 
         im = cv2.imread(entry['image'])
         im_name = os.path.splitext(os.path.basename(entry['image']))[0]
 
         cls_boxes_i = [
-            id_or_index(ix, cls_k_boxes) for cls_k_boxes in all_boxes
+            id_or_index(id_in_pkl, cls_k_boxes) for cls_k_boxes in all_boxes
         ]
         cls_segms_i = [
-            id_or_index(ix, cls_k_segms) for cls_k_segms in all_segms
+            id_or_index(id_in_pkl, cls_k_segms) for cls_k_segms in all_segms
         ]
         cls_keyps_i = [
-            id_or_index(ix, cls_k_keyps) for cls_k_keyps in all_keyps
+            id_or_index(id_in_pkl, cls_k_keyps) for cls_k_keyps in all_keyps
         ]
 
         vis_utils.vis_one_image(
             im[:, :, ::-1],
-            '{:d}_{:s}'.format(ix, im_name),
-            os.path.join(output_dir, 'vis'),
+            '{:d}_{:s}'.format(img_id, im_name),
+            os.path.join(output_dir, 'vis_thrsh_{}'.format(thresh)),
             cls_boxes_i,
             segms=cls_segms_i,
             keypoints=cls_keyps_i,
@@ -146,5 +189,6 @@ if __name__ == '__main__':
         opts.detections,
         opts.thresh,
         opts.output_dir,
-        limit=opts.first
+        sampleNum=opts.sampleNum,
+        class_list_file=opts.class_list_file
     )

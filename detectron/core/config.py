@@ -1105,7 +1105,9 @@ def get_output_dir(datasets, training=True):
     dataset_name = datasets if is_string else ':'.join(datasets)
     tag = 'train' if training else 'test'
     # <output-dir>/<train|test>/<dataset-name>/<model-type>/
-    outdir = osp.join(__C.OUTPUT_DIR, tag, dataset_name, __C.MODEL.TYPE)
+    # outdir = osp.join(__C.OUTPUT_DIR, tag, dataset_name, __C.MODEL.TYPE)
+    # <output-dir>/<dataset-name>/<model-type>/
+    outdir = osp.join(__C.OUTPUT_DIR, dataset_name, __C.MODEL.TYPE)
     if not osp.exists(outdir):
         os.makedirs(outdir)
     return outdir

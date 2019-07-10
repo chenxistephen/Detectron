@@ -38,7 +38,7 @@ from detectron.core.test import im_detect_all
 from detectron.datasets import task_evaluation
 from detectron.datasets.json_dataset import JsonDataset
 from detectron.modeling import model_builder
-from detectron.utils.io import save_object
+from detectron.utils.io import save_object, load_object
 from detectron.utils.timer import Timer
 import detectron.utils.c2 as c2_utils
 import detectron.utils.env as envu
@@ -128,7 +128,6 @@ def run_inference(
             )
 
     all_results = result_getter()
-    import pdb; pdb.set_trace()
     if check_expected_results and is_parent:
         task_evaluation.check_expected_results(
             all_results,
@@ -172,7 +171,7 @@ def test_net_on_dataset(
     print ("det_file = {}==========================".format(det_file))
     if os.path.exists(det_file):
         print ("{} exists! Loading detection results".format(det_file))
-        res = pickle.load(open(det_file, 'rb'))
+        res = load_object(det_file) #pickle.load(open(det_file, 'rb'))
         all_boxes = res['all_boxes']
         all_segms = res['all_segms']
         all_keyps = res['all_keyps']
