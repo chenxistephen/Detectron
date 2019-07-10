@@ -40,7 +40,7 @@ _MNT_DATA_DIR = '/media/data/chnxi/'
 
 # Available datasets
 _DATASETS = {
-    'Fashion_VI_train': {
+    'CameraV3': {
         _IM_DIR:
             _DATA_DIR + '/CameraMeasurementSetV3/',
         _ANN_FN:
