@@ -229,6 +229,14 @@ def _do_detection_eval(json_dataset, res_file, output_dir):
     allAPs = [clsAP50Dict[c] for c in json_dataset.classes[1:]]
     allAPs = np.array(allAPs)
     ap_all = np.mean(allAPs[allAPs > -1])
+    ################################################################################################
+    #print ("P@{} Score = {}, real precision = {}".format(0.9, score_p_at_thrsh, p_at_thrsh))
+    clsThrshAtP90 = clsPRs['cls_thrsh_at_prec'][0.9]
+    clsThrshAtR50 = clsPRs['cls_thrsh_at_rec'][0.5]
+    print ("clsThrshAtP90 = {}".format(clsThrshAtP90))
+    print ("clsThrshAtR50 = {}".format(clsThrshAtR50))
+    ################################################################################################
+    
     if json_dataset.subset_categories is not None:
         subAPs = [clsAP50Dict[c] for c in json_dataset.subset_categories]
         subAPDict = dict(zip(json_dataset.subset_categories, subAPs))
@@ -271,6 +279,28 @@ def _log_detection_eval_metrics(json_dataset, coco_eval):
     clsAP50 = []
     clsAPDict = {}
     clsAP50Dict= {}
+    precList = [0.9]
+    recList = [0.5]
+    clsThrshAtPrec = {}
+    clsNum = len(json_dataset.classes)
+    for p in precList:
+        clsThrshAtPrec[p] = np.zeros(clsNum)
+    clsThrshAtRec = {}
+    for r in recList:
+        clsThrshAtRec[r] = np.zeros(clsNum)
+    ########################################################################
+    def findPrecScoreThrsh(prec, pthrsh, scores):
+        if len(np.where(prec >= pthrsh)[0]) > 0:
+            (p,i) = min((p,i) for (i,p) in enumerate(prec) if p >= pthrsh)
+            return scores[i], p, i
+        else: # highest precision didin't reach threshold, take the precision/score at the max precision
+            max_prec = max(prec)
+            max_prec_idx = np.where(prec==max_prec)[0][0]
+            return scores[max_prec_idx], max_prec, max_prec_idx
+
+    def findRecScoreThrsh(rec, rthrsh, scores):
+        idx = int(rthrsh*100)
+        return scores[idx], idx
     ########################################################################
     logger.info(
         '~~~~ Mean and per-category AP @ IoU=[{:.2f},{:.2f}] ~~~~'.format(
@@ -287,8 +317,23 @@ def _log_detection_eval_metrics(json_dataset, coco_eval):
         ### Logging classwise PR curves at IOU@0.5
         cls_precision = coco_eval.eval['precision'][
             ind_lo, :, cls_ind - 1, 0, 2]
+        cls_scores = coco_eval.eval['scores'][
+            ind_lo, :, cls_ind - 1, 0, 2]
         clsPrecisions.append(cls_precision)
         ap50 = np.mean(cls_precision[cls_precision > -1])
+        ########################################################################
+        # Compute scores at precision/recalls
+        (min_prec,min_prec_idx) = min((p,i) for (i,p) in enumerate(cls_precision) if p > 0)
+        maxClsRecall = recallThrs[min_prec_idx]
+        score_at_max_cls_recall = cls_scores[min_prec_idx]
+
+        for p in precList:
+            score_at_p_thrsh, p_at_thrsh, pidx = findPrecScoreThrsh(cls_precision, p, cls_scores)
+            clsThrshAtPrec[p][cls_ind] = score_at_p_thrsh
+
+        for r in recList:
+            score_at_r_thrsh, ridx = findRecScoreThrsh(recallThrs, r, cls_scores)
+            clsThrshAtRec[r][cls_ind] = max(score_at_r_thrsh, score_at_max_cls_recall)
         ########################################################################
         ap = np.mean(precision[precision > -1])
         clsAPs.append(ap)
@@ -306,8 +351,12 @@ def _log_detection_eval_metrics(json_dataset, coco_eval):
               'clsAPs': clsAPs,
               'clsAP50': clsAP50,
               'clsAPDict':clsAPDict, 
-              'clsAP50Dict': clsAP50Dict
+              'clsAP50Dict': clsAP50Dict,
+              'cls_thrsh_at_prec':clsThrshAtPrec, 
+              'cls_thrsh_at_rec':clsThrshAtRec, 
+              'classes': json_dataset.classes
              }
+                
     return clsPRs
     ########################################################################
 

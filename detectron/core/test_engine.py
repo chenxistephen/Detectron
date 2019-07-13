@@ -158,13 +158,13 @@ def test_net_on_dataset(
         output_dir, 'bbox_' + dataset_name + '_results.json'
     )
     print ("res_file = {}==========================".format(res_file))
-    if os.path.exists(res_file):
-        import detectron.datasets.json_dataset_evaluator as json_dataset_evaluator
-        print ("res_file = {} exists! Loading res_file".format(res_file))
-        coco_eval = json_dataset_evaluator._do_detection_eval(dataset, res_file, output_dir)
-        box_results = task_evaluation._coco_eval_to_box_results(coco_eval)
-        results = OrderedDict([(dataset.name, box_results)])
-        return results     
+#     if os.path.exists(res_file):
+#         import detectron.datasets.json_dataset_evaluator as json_dataset_evaluator
+#         print ("res_file = {} exists! Loading res_file".format(res_file))
+#         coco_eval = json_dataset_evaluator._do_detection_eval(dataset, res_file, output_dir)
+#         box_results = task_evaluation._coco_eval_to_box_results(coco_eval)
+#         results = OrderedDict([(dataset.name, box_results)])
+#         return results     
     ################################################################
     det_name = "detections.pkl"
     det_file = os.path.join(output_dir, det_name)

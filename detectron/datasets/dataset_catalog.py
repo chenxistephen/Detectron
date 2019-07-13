@@ -40,11 +40,11 @@ _MNT_DATA_DIR = '/media/data/chnxi/'
 
 # Available datasets
 _DATASETS = {
-    'CameraV3': {
+    'CameraV3_GOD': {
         _IM_DIR:
-            _DATA_DIR + '/CameraMeasurementSetV3/',
+            _MNT_DATA_DIR + '/CameraMeasurementSetV3/',
         _ANN_FN:
-            _DATA_DIR + '/CameraMeasurementSetV3/json_annotations/CameraV3_annotations.json'
+            _MNT_DATA_DIR + '/CameraMeasurementSetV3/json_annotations/CameraV3_GOD_annotations.json'
     },
     'Fashion_VI_train': {
         _IM_DIR:
@@ -172,6 +172,12 @@ _DATASETS = {
             _DATA_DIR + '/HomeFurniture/Images',
         _ANN_FN:
             _DATA_DIR + '/HomeFurniture/json_annotations/val_SearchIntent_annotations.json'
+    },
+    'bing5k_GOD': {
+        _IM_DIR:
+            _DATA_DIR + '/BingMeasurement_5k/Images',
+        _ANN_FN:
+            _DATA_DIR + '/BingMeasurement_5k/json_annotations/GOD_annotations.json'
     },
     'bing5k_fashion': {
         _IM_DIR:
