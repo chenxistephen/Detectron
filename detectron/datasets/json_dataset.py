@@ -81,6 +81,14 @@ class JsonDataset(object):
             self.subset_categories = None
             self.subset_category_ids = None
         print ("self.subset_categories = {}".format(self.subset_categories))
+        
+        ##############################################################################
+        # Stephen: add classwise instance count and weights for weighted AP
+        from collections import Counter
+        inst_cats = [a['category_id'] for a in self.COCO.dataset['annotations']]
+        C = Counter(inst_cats)
+        self.category_weights = np.array([C[cid] for i, cid in enumerate(category_ids)])
+        self.category_weights = self.category_weights / len(inst_cats)
         ##############################################################################
         
         self.json_category_id_to_contiguous_id = {

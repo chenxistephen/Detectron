@@ -32,6 +32,7 @@ from pycocotools.cocoeval import COCOeval
 from detectron.core.config import cfg
 from detectron.utils.io import save_object
 import detectron.utils.boxes as box_utils
+from detectron.utils.timer import Timer
 
 logger = logging.getLogger(__name__)
 
@@ -215,12 +216,17 @@ def _write_dict_to_tsv(d, filename, title=None):
 
 
 def _do_detection_eval(json_dataset, res_file, output_dir):
+    loadtime = Timer()
+    loadtime.tic()
     coco_dt = json_dataset.COCO.loadRes(str(res_file))
+    loadtime.toc()
+    logger.info('Time to load {}: {:.3f}s'.format(res_file, loadtime.average_time))
     coco_eval = COCOeval(json_dataset.COCO, coco_dt, 'bbox')
     coco_eval.evaluate()
     coco_eval.accumulate()
     clsPRs = _log_detection_eval_metrics(json_dataset, coco_eval)
     clsAP50Dict = clsPRs['clsAP50Dict']
+    clsWAP50Dict = clsPRs['clsWAP50Dict']
     eval_file = os.path.join(output_dir, 'detection_results.pkl')
     cls_pr_file = os.path.join(output_dir, 'classwise_pr_curves.pkl')
     cls_ap_file = os.path.join(output_dir, 'classwise_ap50_{}.tsv'.format(json_dataset.name))
@@ -228,7 +234,10 @@ def _do_detection_eval(json_dataset, res_file, output_dir):
     save_object(clsPRs, cls_pr_file)
     allAPs = [clsAP50Dict[c] for c in json_dataset.classes[1:]]
     allAPs = np.array(allAPs)
+    allWAPs = [clsWAP50Dict[c] for c in json_dataset.classes[1:]]
+    allWAPs = np.array(allWAPs)
     ap_all = np.mean(allAPs[allAPs > -1])
+    wap_all = np.sum(allWAPs[allWAPs> -1])
     ################################################################################################
     #print ("P@{} Score = {}, real precision = {}".format(0.9, score_p_at_thrsh, p_at_thrsh))
     clsThrshAtP90 = clsPRs['cls_thrsh_at_prec'][0.9]
@@ -236,18 +245,20 @@ def _do_detection_eval(json_dataset, res_file, output_dir):
     print ("clsThrshAtP90 = {}".format(clsThrshAtP90))
     print ("clsThrshAtR50 = {}".format(clsThrshAtR50))
     ################################################################################################
-    
+    title = '~~~~ mAP for all categories ~~~~ = {:.2f}\n~~~~ Weighted AP for all categories ~~~~ = {:.2f}\n'.format(100 * ap_all, 100*wap_all)
     if json_dataset.subset_categories is not None:
         subAPs = [clsAP50Dict[c] for c in json_dataset.subset_categories]
+        subWAPs = [clsWAP50Dict[c] for c in json_dataset.subset_categories]
         subAPDict = dict(zip(json_dataset.subset_categories, subAPs))
         subAPs = np.array(subAPs)
+        subWAPs = np.array(subWAPs)
         ap_subset = np.mean(subAPs[subAPs > 0.0])
-        title = '~~~~ mAP for all categories ~~~~ = {:.1f} \n~~~~ mAP for subset categories ~~~~ = {:.1f}\n'.format(100 * ap_all, 100 * ap_subset)
+        wap_subset = np.mean(subWAPs[subWAPs > 0.0])
+        title = title + '~~~~ mAP for subset categories ~~~~ = {:.2f}\n~~~~ WAP for subset categories ~~~~ = {:.2f}\n'.format(100 * ap_subset, 100 * wap_subset)
         _write_dict_to_tsv(subAPDict, cls_ap_file, title)
-        logger.info(title)
     else:
-        title = '~~~~ mAP for all categories ~~~~ = {:.1f}'.format(100 * ap_all)
         _write_dict_to_tsv(clsAP50Dict, cls_ap_file, title)
+    logger.info('\n' + title)
     logger.info('Wrote json eval results to: {}'.format(eval_file))
     logger.info('Wrote classwise PR results to: {}'.format(cls_pr_file))
     logger.info('Wrote classwise AP results to: {}'.format(cls_ap_file))
@@ -277,8 +288,10 @@ def _log_detection_eval_metrics(json_dataset, coco_eval):
     clsPrecisions = []
     clsAPs = []
     clsAP50 = []
+    clsWAP50 = []
     clsAPDict = {}
     clsAP50Dict= {}
+    clsWAP50Dict = {}
     precList = [0.9]
     recList = [0.5]
     clsThrshAtPrec = {}
@@ -321,9 +334,14 @@ def _log_detection_eval_metrics(json_dataset, coco_eval):
             ind_lo, :, cls_ind - 1, 0, 2]
         clsPrecisions.append(cls_precision)
         ap50 = np.mean(cls_precision[cls_precision > -1])
+        wap50 = ap50 * json_dataset.category_weights[cls_ind - 1]
         ########################################################################
-        # Compute scores at precision/recalls
-        (min_prec,min_prec_idx) = min((p,i) for (i,p) in enumerate(cls_precision) if p > 0)
+        # Compute scores at precision/recall
+        # print ("class {}: cls_precision= {}".format(cls, cls_precision))
+        if min(cls_precision) > 0:
+            (min_prec,min_prec_idx) = min((p,i) for (i,p) in enumerate(cls_precision) if p > 0)
+        else:
+            min_prec_idx = 0
         maxClsRecall = recallThrs[min_prec_idx]
         score_at_max_cls_recall = cls_scores[min_prec_idx]
 
@@ -335,11 +353,14 @@ def _log_detection_eval_metrics(json_dataset, coco_eval):
             score_at_r_thrsh, ridx = findRecScoreThrsh(recallThrs, r, cls_scores)
             clsThrshAtRec[r][cls_ind] = max(score_at_r_thrsh, score_at_max_cls_recall)
         ########################################################################
+        # Stephen: Compute AP and Weightd AP
         ap = np.mean(precision[precision > -1])
         clsAPs.append(ap)
         clsAP50.append(ap50)
+        clsWAP50.append(wap50)
         clsAPDict[cls] = ap
         clsAP50Dict[cls] = ap50
+        clsWAP50Dict[cls] = wap50
         logger.info('{}: {:.1f}'.format(cls, 100 * ap))
     logger.info('~~~~ Summary metrics ~~~~')
     coco_eval.summarize()
@@ -350,11 +371,13 @@ def _log_detection_eval_metrics(json_dataset, coco_eval):
               'clsPrecisions':clsPrecisions,
               'clsAPs': clsAPs,
               'clsAP50': clsAP50,
+              'clsWAP50': clsWAP50,
               'clsAPDict':clsAPDict, 
               'clsAP50Dict': clsAP50Dict,
+              'clsWAP50Dict': clsWAP50Dict,
               'cls_thrsh_at_prec':clsThrshAtPrec, 
               'cls_thrsh_at_rec':clsThrshAtRec, 
-              'classes': json_dataset.classes
+              'classes': json_dataset.classes[1:] # remove background
              }
                 
     return clsPRs
