@@ -36,9 +36,16 @@ _DEVKIT_DIR = 'devkit_directory'
 _RAW_DIR = 'raw_dir'
 
 _GOD_DATA_DIR = '/media/data/chnxi/GOD/'
+_MNT_DATA_DIR = '/media/data/chnxi/'
 
 # Available datasets
 _DATASETS = {
+    'CameraV3_GOD': {
+        _IM_DIR:
+            _MNT_DATA_DIR + '/CameraMeasurementSetV3/',
+        _ANN_FN:
+            _MNT_DATA_DIR + '/CameraMeasurementSetV3/json_annotations/CameraV3_GOD_annotations.json'
+    },
     'Fashion_VI_train': {
         _IM_DIR:
             _DATA_DIR + '/',
@@ -136,6 +143,12 @@ _DATASETS = {
         _ANN_FN:
             _DATA_DIR + '/FashionV2/json_annotations/train_annotations.json'
     },
+    'HFV_FashionV2_val': {
+        _IM_DIR:
+            _DATA_DIR + '/FashionV2/Images',
+        _ANN_FN:
+            _MNT_DATA_DIR + '/FashionV3/json_annotations/HF_on_Fashion_val_annotations.json'
+    },
     'FashionV2_val': {
         _IM_DIR:
             _DATA_DIR + '/FashionV2/Images',
@@ -177,6 +190,24 @@ _DATASETS = {
             _DATA_DIR + '/HomeFurniture/Images',
         _ANN_FN:
             _DATA_DIR + '/HomeFurniture/json_annotations/val_SearchIntent_annotations.json'
+    },
+    'bing5k_GOD': {
+        _IM_DIR:
+            _DATA_DIR + '/BingMeasurement_5k/Images',
+        _ANN_FN:
+            _DATA_DIR + '/BingMeasurement_5k/json_annotations/GOD_annotations.json'
+    },
+    'bing5k_fashion': {
+        _IM_DIR:
+            _DATA_DIR + '/BingMeasurement_5k/Images',
+        _ANN_FN:
+            _DATA_DIR + '/BingMeasurement_5k/json_annotations/fashion_annotations.json'
+    },
+    'bing5k_fashion_thumbnail': {
+        _IM_DIR:
+            _DATA_DIR + '/BingMeasurement_5k/Thumbnails',
+        _ANN_FN:
+            _DATA_DIR + '/BingMeasurement_5k/json_annotations/fashion_thumbnail_annotations.json'
     },
     'bing5k_furniture': {
         _IM_DIR:

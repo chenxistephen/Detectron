@@ -46,9 +46,16 @@ def parse_args():
         type=str
     )
     parser.add_argument(
-        '--detections',
-        dest='detections',
-        help='detections pkl file',
+        '--detections1',
+        dest='detections1',
+        help='detections pkl file 1',
+        default='',
+        type=str
+    )
+    parser.add_argument(
+        '--detections2',
+        dest='detections2',
+        help='detections pkl file 2',
         default='',
         type=str
     )
@@ -56,6 +63,20 @@ def parse_args():
         '--class_list_file',
         dest='class_list_file',
         help='class_list_file',
+        default=None,
+        type=str
+    )
+    parser.add_argument(
+        '--cls_thrsh_file1',
+        dest='cls_thrsh_file1',
+        help='cls_thrsh_file1',
+        default=None,
+        type=str
+    )
+    parser.add_argument(
+        '--cls_thrsh_file2',
+        dest='cls_thrsh_file2',
+        help='cls_thrsh_file2',
         default=None,
         type=str
     )
@@ -102,7 +123,7 @@ def parse_args():
     return args
 
 import numpy as np
-def vis(dataset, detections_pkl, thresh, output_dir, sampleNum=None, class_list_file=None):
+def vis(dataset, detections_pkl1, detections_pkl2, output_dir,  thresh=0.5, cls_thrsh_file1=None, cls_thrsh_file2=None, sampleNum=None, class_list_file=None):
     ds = JsonDataset(dataset)
     #classes_list = [l.rstrip() for l in open('/home/chnxi/data/HomeFurniture/taxonomy/furniture_58_labels.txt','r').readlines()]
     if class_list_file is not None:
@@ -114,7 +135,7 @@ def vis(dataset, detections_pkl, thresh, output_dir, sampleNum=None, class_list_
     print (classes_list)
     roidb = ds.get_roidb()
     
-    if 'range' in detections_pkl:
+    if 'range' in detections_pkl1:
         pkl_range = osp.splitext(s)[0].split('range_')[-1].split('_')
         pkl_range = [int(r) for r in id_range]
     else:
@@ -128,16 +149,26 @@ def vis(dataset, detections_pkl, thresh, output_dir, sampleNum=None, class_list_
     else:
         ids_in_pkl = list(range(pklNum))
         
-    dets = load_object(detections_pkl)
+    dets1 = load_object(detections_pkl1)
+    dets2 = load_object(detections_pkl2)
+    
+    clsPR1 = load_object(cls_thrsh_file1)
+    clsPR2 = load_object(cls_thrsh_file2)
+    
+    cls_thrsh_list1 = clsPR1['cls_thrsh_at_prec'][0.9]
+    cls_thrsh_list2 = clsPR2['cls_thrsh_at_prec'][0.9]
     
     print ("pkl_range = {}, sampleNum = {}, len(ids_in_pkl) = {}, len(roidb) = {}".format(pkl_range, sampleNum, len(ids_in_pkl), len(roidb)))
 
-    assert all(k in dets for k in ['all_boxes', 'all_segms', 'all_keyps']), \
+    assert all(k in dets1 for k in ['all_boxes', 'all_segms', 'all_keyps']), \
+        'Expected detections pkl file in the format used by test_engine.py'
+    
+    assert all(k in dets2 for k in ['all_boxes', 'all_segms', 'all_keyps']), \
         'Expected detections pkl file in the format used by test_engine.py'
 
-    all_boxes = dets['all_boxes']
-    all_segms = dets['all_segms']
-    all_keyps = dets['all_keyps']
+    all_boxes1 = dets1['all_boxes']
+    all_boxes2 = dets2['all_boxes']
+
 
     def id_or_index(ix, val):
         if len(val) == 0:
@@ -156,29 +187,28 @@ def vis(dataset, detections_pkl, thresh, output_dir, sampleNum=None, class_list_
         im = cv2.imread(entry['image'])
         im_name = os.path.splitext(os.path.basename(entry['image']))[0]
 
-        cls_boxes_i = [
-            id_or_index(id_in_pkl, cls_k_boxes) for cls_k_boxes in all_boxes
+        img_cls_boxes_1 = [
+            id_or_index(id_in_pkl, cls_k_boxes) for cls_k_boxes in all_boxes1
         ]
-        cls_segms_i = [
-            id_or_index(id_in_pkl, cls_k_segms) for cls_k_segms in all_segms
+    
+        img_cls_boxes_2 = [
+            id_or_index(id_in_pkl, cls_k_boxes) for cls_k_boxes in all_boxes2
         ]
-        cls_keyps_i = [
-            id_or_index(id_in_pkl, cls_k_keyps) for cls_k_keyps in all_keyps
-        ]
-
-        vis_utils.vis_one_image(
+        vis_utils.diff_vis_one_image(
             im[:, :, ::-1],
             '{:d}_{:s}'.format(img_id, im_name),
-            os.path.join(output_dir, 'vis_thrsh_{}'.format(thresh)),
-            cls_boxes_i,
-            segms=cls_segms_i,
-            keypoints=cls_keyps_i,
+            os.path.join(output_dir, 'vis_thrsh_P90'),
+            img_cls_boxes_1,
+            img_cls_boxes_2,
             thresh=thresh,
             box_alpha=0.8,
             dataset=ds,
             show_class=True, 
             ext='.png', 
-            classes_list=classes_list
+            classes_list=classes_list,
+            cls_thrsh_list1=cls_thrsh_list1,
+            cls_thrsh_list2=cls_thrsh_list2,
+            out_when_no_box=True
         )
 
 
@@ -186,9 +216,12 @@ if __name__ == '__main__':
     opts = parse_args()
     vis(
         opts.dataset,
-        opts.detections,
-        opts.thresh,
+        opts.detections1,
+        opts.detections2,
         opts.output_dir,
+        thresh=opts.thresh,
         sampleNum=opts.sampleNum,
-        class_list_file=opts.class_list_file
+        class_list_file=opts.class_list_file,
+        cls_thrsh_file1=opts.cls_thrsh_file1,
+        cls_thrsh_file2=opts.cls_thrsh_file2
     )

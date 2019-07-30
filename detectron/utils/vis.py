@@ -396,3 +396,119 @@ def vis_one_image(
     output_name = os.path.basename(im_name) + '.' + ext
     fig.savefig(os.path.join(output_dir, '{}'.format(output_name)), dpi=dpi)
     plt.close('all')
+        
+    
+def diff_vis_one_image(
+        im, im_name, output_dir, boxes1, boxes2, color1='r', color2='b', gtcolor='g', cls_thrsh_list1=None, cls_thrsh_list2=None, segms=None, keypoints=None, thresh=0.9,
+        kp_thresh=2, dpi=200, box_alpha=0.0, dataset=None, show_class=False,
+        ext='pdf', out_when_no_box=False,classes_list=None):
+    """Visual debugging of detections."""
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    if isinstance(boxes1, list):
+        boxes1, segms, keypoints, classes1 = convert_from_cls_format(
+            boxes1, segms, keypoints)
+        
+    if isinstance(boxes2, list):
+        boxes2, segms, keypoints, classes2 = convert_from_cls_format(
+            boxes2, segms, keypoints)
+
+    if (boxes1 is None or boxes1.shape[0] == 0 or max(boxes1[:, 4]) < thresh) and (boxes2 is None or boxes2.shape[0] == 0 or max(boxes2[:, 4]) < thresh) and not out_when_no_box:
+        return
+
+    fig = plt.figure(frameon=False)
+    fig.set_size_inches(im.shape[1] / dpi, im.shape[0] / dpi)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.axis('off')
+    fig.add_axes(ax)
+    ax.imshow(im)
+    
+    def draw_boxes(boxes, inds, classes, color, cls_thrsh_list=None, textmode=1):
+        for i in inds:
+            bbox = boxes[i, :4]
+            score = boxes[i, -1]
+            if cls_thrsh_list is not None:
+                cls_id = classes[i]
+                cls_thrsh = cls_thrsh_list[cls_id] if cls_id < len(cls_thrsh_list) else 1
+            else:
+                cls_thrsh = thresh
+            if score < cls_thrsh:
+                continue
+
+            # show box (off by default)
+            ax.add_patch(
+                plt.Rectangle((bbox[0], bbox[1]),
+                              bbox[2] - bbox[0],
+                              bbox[3] - bbox[1],
+                              fill=False, edgecolor=color,
+                              linewidth=1, alpha=box_alpha))
+
+            if show_class:
+                if classes_list is not None:
+                    class_name = classes_list[classes[i]] if classes[i] < len(classes_list) else 'BG'
+                    class_str = '{}:{:.2f}'.format(class_name, score)
+                else:
+                    class_str = get_class_string(classes[i], score, dataset)
+                tx = bbox[0]
+                ty = bbox[1]+10 if textmode is 1 else bbox[3] - 10
+                ax.text(
+                    tx, ty,
+                    class_str,
+                    fontsize=8,
+                    family='serif',
+                    bbox=dict(
+                        facecolor=color, alpha=0.4, pad=0, edgecolor='none'),
+                    color='white')
+
+    if boxes1 is None:
+        sorted_inds1 = [] # avoid crash when 'boxes1' is None
+    else:
+        # Display in largest to smallest order to reduce occlusion
+        areas = (boxes1[:, 2] - boxes1[:, 0]) * (boxes1[:, 3] - boxes1[:, 1])
+        sorted_inds1 = np.argsort(-areas)
+        
+    draw_boxes(boxes1, sorted_inds1, classes1, color1, cls_thrsh_list1, textmode=1)
+    
+    if boxes2 is None:
+        sorted_inds2 = [] # avoid crash when 'boxes1' is None
+    else:
+        # Display in largest to smallest order to reduce occlusion
+        areas = (boxes2[:, 2] - boxes2[:, 0]) * (boxes2[:, 3] - boxes2[:, 1])
+        sorted_inds2 = np.argsort(-areas)
+        
+    draw_boxes(boxes2, sorted_inds2, classes2, color2, cls_thrsh_list2, textmode=2)
+    
+    
+
+#     for i in sorted_inds:
+#         bbox = boxes1[i, :4]
+#         score = boxes1[i, -1]
+#         if score < thresh:
+#             continue
+
+#         # show box (off by default)
+#         ax.add_patch(
+#             plt.Rectangle((bbox[0], bbox[1]),
+#                           bbox[2] - bbox[0],
+#                           bbox[3] - bbox[1],
+#                           fill=False, edgecolor=color1,
+#                           linewidth=1, alpha=box_alpha))
+
+#         if show_class:
+#             if classes_list is not None:
+#                 class_str = '{}:{:.2f}'.format(classes_list[classes[i]], score)
+#             else:
+#                 class_str = get_class_string(classes[i], score, dataset)
+#             ax.text(
+#                 bbox[0], bbox[1] + 10,
+#                 class_str,
+#                 fontsize=8,
+#                 family='serif',
+#                 bbox=dict(
+#                     facecolor=color1, alpha=0.4, pad=0, edgecolor='none'),
+#                 color='white')
+
+    output_name = os.path.basename(im_name) + '.' + ext
+    fig.savefig(os.path.join(output_dir, '{}'.format(output_name)), dpi=dpi)
+    plt.close('all')
