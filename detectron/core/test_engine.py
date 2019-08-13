@@ -86,7 +86,8 @@ def run_inference(
     weights_file, ind_range=None,
     multi_gpu_testing=False, gpu_id=0,
     check_expected_results=False,
-    test_only=True
+    test_only=True,
+    computeLocPR=False
 ):
     parent_func, child_func = get_eval_functions()
     is_parent = ind_range is None
@@ -107,7 +108,8 @@ def run_inference(
                     proposal_file,
                     output_dir,
                     multi_gpu=multi_gpu_testing,
-                    test_only=test_only
+                    test_only=test_only,
+                    computeLocPR=computeLocPR
                 )
                 all_results.update(results)
 
@@ -146,7 +148,8 @@ def test_net_on_dataset(
     output_dir,
     multi_gpu=False,
     gpu_id=0, 
-    test_only=True
+    test_only=True,
+    computeLocPR=False
 ):
     """Run inference on a dataset."""
     dataset = JsonDataset(dataset_name)
@@ -161,7 +164,7 @@ def test_net_on_dataset(
     if os.path.exists(res_file):
         import detectron.datasets.json_dataset_evaluator as json_dataset_evaluator
         print ("res_file = {} exists! Loading res_file".format(res_file))
-        coco_eval = json_dataset_evaluator._do_detection_eval(dataset, res_file, output_dir)
+        coco_eval = json_dataset_evaluator._do_detection_eval(dataset, res_file, output_dir,computeLocPR)
         box_results = task_evaluation._coco_eval_to_box_results(coco_eval)
         results = OrderedDict([(dataset.name, box_results)])
         return results     
@@ -191,7 +194,7 @@ def test_net_on_dataset(
         return OrderedDict([(dataset.name, all_boxes)])
     else:
         results = task_evaluation.evaluate_all(
-            dataset, all_boxes, all_segms, all_keyps, output_dir
+            dataset, all_boxes, all_segms, all_keyps, output_dir,computeLocPR=computeLocPR
         )
     return results
 

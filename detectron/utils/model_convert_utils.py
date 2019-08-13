@@ -363,6 +363,7 @@ def compare_model(model1_func, model2_func, test_image, check_blobs):
         cb2 = check_blobs.values()
     print('Running the first model...')
     res1 = model1_func(test_image, check_blobs)
+    print (res1)
     print('Running the second model...')
     res2 = model2_func(test_image, check_blobs)
     for idx in range(len(cb1)):

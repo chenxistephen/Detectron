@@ -307,7 +307,8 @@ def vis_one_image(
 
         if show_class:
             if classes_list is not None:
-                class_str = '{}:{:.2f}'.format(classes_list[classes[i]], score)
+                class_name = classes_list[classes[i]] if classes[i] < len(classes_list) else 'BG'
+                class_str = '{}:{:.3f}'.format(class_name, score)
             else:
                 class_str = get_class_string(classes[i], score, dataset)
             ax.text(
@@ -399,9 +400,9 @@ def vis_one_image(
         
     
 def diff_vis_one_image(
-        im, im_name, output_dir, boxes1, boxes2, color1='r', color2='b', gtcolor='g', cls_thrsh_list1=None, cls_thrsh_list2=None, segms=None, keypoints=None, thresh=0.9,
+        im, im_name, output_dir, boxes1, boxes2, color1='r', color2='b', gtcolor='g', cls_thrsh_list1=None, cls_thrsh_list2=None, segms=None, keypoints=None, thresh1=0.5, thresh2=0.5, 
         kp_thresh=2, dpi=200, box_alpha=0.0, dataset=None, show_class=False,
-        ext='pdf', out_when_no_box=False,classes_list=None):
+        ext='pdf', out_when_no_box=False,classes_list=None, classes_list2=None):
     """Visual debugging of detections."""
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -414,7 +415,7 @@ def diff_vis_one_image(
         boxes2, segms, keypoints, classes2 = convert_from_cls_format(
             boxes2, segms, keypoints)
 
-    if (boxes1 is None or boxes1.shape[0] == 0 or max(boxes1[:, 4]) < thresh) and (boxes2 is None or boxes2.shape[0] == 0 or max(boxes2[:, 4]) < thresh) and not out_when_no_box:
+    if (boxes1 is None or boxes1.shape[0] == 0 or max(boxes1[:, 4]) < thresh1) and (boxes2 is None or boxes2.shape[0] == 0 or max(boxes2[:, 4]) < thresh2) and not out_when_no_box:
         return
 
     fig = plt.figure(frameon=False)
@@ -424,7 +425,7 @@ def diff_vis_one_image(
     fig.add_axes(ax)
     ax.imshow(im)
     
-    def draw_boxes(boxes, inds, classes, color, cls_thrsh_list=None, textmode=1):
+    def draw_boxes(boxes, inds, classes, color, thresh=0.5, classes_list=None, cls_thrsh_list=None, textmode=1):
         for i in inds:
             bbox = boxes[i, :4]
             score = boxes[i, -1]
@@ -434,6 +435,10 @@ def diff_vis_one_image(
             else:
                 cls_thrsh = thresh
             if score < cls_thrsh:
+                continue
+                
+            # not show BG classes if model outputs more classes than taxonomy
+            if classes_list is not None and classes[i] >= len(classes_list):
                 continue
 
             # show box (off by default)
@@ -468,7 +473,7 @@ def diff_vis_one_image(
         areas = (boxes1[:, 2] - boxes1[:, 0]) * (boxes1[:, 3] - boxes1[:, 1])
         sorted_inds1 = np.argsort(-areas)
         
-    draw_boxes(boxes1, sorted_inds1, classes1, color1, cls_thrsh_list1, textmode=1)
+    draw_boxes(boxes1, sorted_inds1, classes1, color1, thresh=thresh1, classes_list=classes_list, cls_thrsh_list=cls_thrsh_list1, textmode=1)
     
     if boxes2 is None:
         sorted_inds2 = [] # avoid crash when 'boxes1' is None
@@ -477,7 +482,7 @@ def diff_vis_one_image(
         areas = (boxes2[:, 2] - boxes2[:, 0]) * (boxes2[:, 3] - boxes2[:, 1])
         sorted_inds2 = np.argsort(-areas)
         
-    draw_boxes(boxes2, sorted_inds2, classes2, color2, cls_thrsh_list2, textmode=2)
+    draw_boxes(boxes2, sorted_inds2, classes2, color2, thresh=thresh2, classes_list=classes_list2, cls_thrsh_list=cls_thrsh_list2, textmode=2)
     
     
 

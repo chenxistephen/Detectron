@@ -69,6 +69,9 @@ def parse_args():
         '--eval_test', dest='eval_test', help='eval_test', action='store_true'
     )
     parser.add_argument(
+        '--compute_loc_pr', dest='compute_loc_pr', help='compute_loc_pr', action='store_true'
+    )
+    parser.add_argument(
         '--multi-gpu-testing',
         dest='multi_gpu_testing',
         help='using cfg.NUM_GPUS for inference',
@@ -117,5 +120,6 @@ if __name__ == '__main__':
         ind_range=args.range,
         multi_gpu_testing=args.multi_gpu_testing,
         check_expected_results=False, #True,
-        test_only=not args.eval_test        
+        test_only=not args.eval_test,
+        computeLocPR=args.compute_loc_pr
     )

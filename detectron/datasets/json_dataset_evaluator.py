@@ -140,7 +140,7 @@ def _do_segmentation_eval(json_dataset, res_file, output_dir):
 
 
 def evaluate_boxes(
-    json_dataset, all_boxes, output_dir, use_salt=True, cleanup=False
+    json_dataset, all_boxes, output_dir, use_salt=True, cleanup=False, computeLocPR=False
 ):
     res_file = os.path.join(
         output_dir, 'bbox_' + json_dataset.name + '_results'
@@ -151,7 +151,7 @@ def evaluate_boxes(
     _write_coco_bbox_results_file(json_dataset, all_boxes, res_file)
     # Only do evaluation on non-test sets (annotations are undisclosed on test)
     if json_dataset.name.find('test') == -1:
-        coco_eval = _do_detection_eval(json_dataset, res_file, output_dir)
+        coco_eval = _do_detection_eval(json_dataset, res_file, output_dir, computeLocPR)
     else:
         logger.warning(
             '{} eval ignored as annotations are undisclosed on test: {} ignored'
@@ -215,45 +215,63 @@ def _write_dict_to_tsv(d, filename, title=None):
             fout.write('{}\t{}\n'.format(k,v))
 
 
-def _do_detection_eval(json_dataset, res_file, output_dir):
+def _do_detection_eval(json_dataset, res_file, output_dir, computeLocPR=False):
     loadtime = Timer()
     loadtime.tic()
     coco_dt = json_dataset.COCO.loadRes(str(res_file))
     loadtime.toc()
     logger.info('Time to load {}: {:.3f}s'.format(res_file, loadtime.average_time))
-    coco_eval = COCOeval(json_dataset.COCO, coco_dt, 'bbox')
-    coco_eval.evaluate()
-    coco_eval.accumulate()
-    clsPRs = _log_detection_eval_metrics(json_dataset, coco_eval)
-    clsAP50Dict = clsPRs['clsAP50Dict']
-    clsWAP50Dict = clsPRs['clsWAP50Dict']
     eval_file = os.path.join(output_dir, 'detection_results.pkl')
     cls_pr_file = os.path.join(output_dir, 'classwise_pr_curves.pkl')
+    loc_pr_file = os.path.join(output_dir, 'localization_pr_curves.pkl')
     cls_ap_file = os.path.join(output_dir, 'classwise_ap50_{}.tsv'.format(json_dataset.name))
+    ################################################################################################
+    ### Evaluate for localization precision/recall
+    if computeLocPR:
+        print ("Evaluating *Localization* PR")
+        coco_eval = COCOeval(json_dataset.COCO, coco_dt, 'bbox')
+        coco_eval.params.useCats = 0
+        evaltime = Timer(); evaltime.tic()
+        coco_eval.evaluate()
+        evaltime.toc(); logger.info('Time to COCOeval: {:.3f}s'.format(evaltime.average_time))
+        coco_eval.accumulate()
+        coco_eval.summarize()
+        locPRs = _log_localization_eval_metrics(coco_eval)
+        save_object(locPRs, loc_pr_file)
+        print ("saved locPRs to {}".format(loc_pr_file))
+        print ("locPRs['loc_thrsh_at_prec'][0.9] = {}".format(locPRs['loc_thrsh_at_prec'][0.9]))
+        #import pdb; pdb.set_trace()
+    ################################################################################################
+    coco_eval = COCOeval(json_dataset.COCO, coco_dt, 'bbox')
+    coco_eval.params.useCats = 1
+    coco_eval.evaluate()
+    coco_eval.accumulate()
+    clsPRs = _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.8, 0.75, 0.7])
+    clsAP50Dict = clsPRs['clsAP50Dict']
+    #clsWAP50Dict = clsPRs['clsWAP50Dict']
+
     save_object(coco_eval, eval_file)
     save_object(clsPRs, cls_pr_file)
-    allAPs = [clsAP50Dict[c] for c in json_dataset.classes[1:]]
-    allAPs = np.array(allAPs)
-    allWAPs = [clsWAP50Dict[c] for c in json_dataset.classes[1:]]
-    allWAPs = np.array(allWAPs)
+    allAPs = np.array([clsAP50Dict[c] for c in json_dataset.classes[1:]])
+    #allWAPs = np.array([clsWAP50Dict[c] for c in json_dataset.classes[1:]])
+    allWAPs = np.array([ap50 * json_dataset.category_weights[i] for i, ap50 in enumerate(allAPs)])
     ap_all = np.mean(allAPs[allAPs > -1])
     wap_all = np.sum(allWAPs[allWAPs> -1])
     ################################################################################################
     #print ("P@{} Score = {}, real precision = {}".format(0.9, score_p_at_thrsh, p_at_thrsh))
     clsThrshAtP90 = clsPRs['cls_thrsh_at_prec'][0.9]
     clsThrshAtR50 = clsPRs['cls_thrsh_at_rec'][0.5]
-    print ("clsThrshAtP90 = {}".format(clsThrshAtP90))
-    print ("clsThrshAtR50 = {}".format(clsThrshAtR50))
+    #print ("clsThrshAtP90 = {}".format(clsThrshAtP90))
+    #print ("clsThrshAtR50 = {}".format(clsThrshAtR50))
     ################################################################################################
     title = '~~~~ mAP for all categories ~~~~ = {:.2f}\n~~~~ Weighted AP for all categories ~~~~ = {:.2f}\n'.format(100 * ap_all, 100*wap_all)
     if json_dataset.subset_categories is not None:
-        subAPs = [clsAP50Dict[c] for c in json_dataset.subset_categories]
-        subWAPs = [clsWAP50Dict[c] for c in json_dataset.subset_categories]
+        subAPs = np.array([clsAP50Dict[c] for c in json_dataset.subset_categories])
+        #subWAPs = [clsWAP50Dict[c] for c in json_dataset.subset_categories]
+        subWAPs = np.array([ap50 * json_dataset.subset_category_weights[isub] for isub, ap50 in enumerate(subAPs)])
         subAPDict = dict(zip(json_dataset.subset_categories, subAPs))
-        subAPs = np.array(subAPs)
-        subWAPs = np.array(subWAPs)
-        ap_subset = np.mean(subAPs[subAPs > 0.0])
-        wap_subset = np.mean(subWAPs[subWAPs > 0.0])
+        ap_subset = np.mean(subAPs[subAPs > -1])
+        wap_subset = np.sum(subWAPs[subWAPs > -1])
         title = title + '~~~~ mAP for subset categories ~~~~ = {:.2f}\n~~~~ WAP for subset categories ~~~~ = {:.2f}\n'.format(100 * ap_subset, 100 * wap_subset)
         _write_dict_to_tsv(subAPDict, cls_ap_file, title)
     else:
@@ -265,7 +283,125 @@ def _do_detection_eval(json_dataset, res_file, output_dir):
     return coco_eval
 
 
-def _log_detection_eval_metrics(json_dataset, coco_eval):
+def _log_localization_eval_metrics(coco_eval, fgclass='foreground', precList = [0.9, 0.85, 0.8, 0.75], recList=[0.4]):
+    def _get_thr_ind(coco_eval, thr):
+        ind = np.where((coco_eval.params.iouThrs > thr - 1e-5) &
+                       (coco_eval.params.iouThrs < thr + 1e-5))[0][0]
+        iou_thr = coco_eval.params.iouThrs[ind]
+        assert np.isclose(iou_thr, thr)
+        return ind
+    locClasses = [fgclass]
+    IoU_lo_thresh = 0.5
+    IoU_hi_thresh = 0.95
+    ind_lo = _get_thr_ind(coco_eval, IoU_lo_thresh)
+    ind_hi = _get_thr_ind(coco_eval, IoU_hi_thresh)
+    # precision has dims (iou, recall, cls, area range, max dets)
+    # area range index 0: all area ranges
+    # max dets index 2: 100 per image
+    precision = coco_eval.eval['precision'][ind_lo, :, :, 0, 2]
+    ap_default = np.mean(precision[precision > -1])
+    ########################################################################
+    ### Logging classwise PR curves
+    recallThrs = coco_eval.params.recThrs
+    locPrecisions = []
+    locAPs = []
+    locAP50 = []
+    locWAP50 = []
+    locAPDict = {}
+    locAP50Dict= {}
+    locWAP50Dict = {}
+    #     precList = [0.9, 0.85, 0.8, 0.75, 0.7]
+    #     recList = [0.4]
+    locThrshAtPrec = {}
+    clsNum = len(locClasses)
+    for p in precList:
+        locThrshAtPrec[p] = {}
+    locThrshAtRec = {}
+    for r in recList:
+        locThrshAtRec[r] = {}
+    ########################################################################
+    def findPrecScoreThrsh(prec, pthrsh, scores):
+        if len(np.where(prec >= pthrsh)[0]) > 0:
+            (p,i) = min((p,i) for (i,p) in enumerate(prec) if p >= pthrsh)
+            return scores[i], p, i
+        else: # highest precision didin't reach threshold, take the precision/score at the max precision
+            max_prec = max(prec)
+            max_prec_idx = np.where(prec==max_prec)[0][0]
+            return scores[max_prec_idx], max_prec, max_prec_idx
+
+    def findRecScoreThrsh(rec, rthrsh, scores):
+        if len(np.where(rec >= rthrsh)[0]) > 0:
+            idx = int(rthrsh*100)
+        else: # highest recall didin't reach threshold, take the recall/score at the max recall
+            (min_prec,min_prec_idx) = min((p,i) for (i,p) in enumerate(loc_precision) if p > 0)
+            idx = min_prec_idx
+        return scores[idx], idx
+    ########################################################################
+    logger.info(
+        '~~~~ Mean and per-category AP @ IoU=[{:.2f},{:.2f}] ~~~~'.format(
+            IoU_lo_thresh, IoU_hi_thresh))
+    logger.info('{:.1f}'.format(100 * ap_default))
+    print("coco_eval.eval['precision'].shape = {}".format(coco_eval.eval['precision'].shape))
+    for cls_ind, cls in enumerate(locClasses):
+#         if cls == '__background__':
+#             continue
+        # don't minus 1 because of no  __background__ in returned coco_eval
+        precision = coco_eval.eval['precision'][
+            ind_lo:(ind_hi + 1), :, cls_ind, 0, 2]
+        ########################################################################
+        ### Logging classwise PR curves at IOU@0.5
+        loc_precision = coco_eval.eval['precision'][
+            ind_lo, :, cls_ind, 0, 2]
+        loc_scores = coco_eval.eval['scores'][
+            ind_lo, :, cls_ind, 0, 2]
+        locPrecisions.append(loc_precision)
+        ap50 = np.mean(loc_precision[loc_precision > -1])
+        ########################################################################
+        # Compute scores at precision/recall
+        # print ("class {}: loc_precision= {}".format(cls, loc_precision))
+        (min_prec,min_prec_idx) = min((p,i) for (i,p) in enumerate(loc_precision) if p > 0)
+        #else:
+        #    min_prec_idx = 0
+#         maxClsRecall = recallThrs[min_prec_idx]
+#         score_at_max_loc_recall = loc_scores[min_prec_idx]
+
+        for p in precList:
+            score_at_p_thrsh, p_at_thrsh, pidx = findPrecScoreThrsh(loc_precision, p, loc_scores)
+            locThrshAtPrec[p][cls_ind] = {'score': score_at_p_thrsh, 'recall': recallThrs[pidx]}
+
+        for r in recList:
+            score_at_r_thrsh, ridx = findRecScoreThrsh(recallThrs, r, loc_scores)
+            locThrshAtRec[r][cls_ind] = {'score': score_at_r_thrsh, 'precision': loc_precision[ridx]} 
+            # score_at_r_thrsh #max(score_at_r_thrsh, score_at_max_loc_recall)
+        ########################################################################
+        # Stephen: Compute AP and Weightd AP
+        ap = np.mean(precision[precision > -1])
+        locAPs.append(ap)
+        locAP50.append(ap50)
+        locAPDict[cls] = ap
+        locAP50Dict[cls] = ap50
+        logger.info('{}: {:.1f}'.format(cls, 100 * ap))
+    logger.info('~~~~ Summary metrics ~~~~')
+    coco_eval.summarize()
+    ########################################################################
+    ### Logging classwise PR curves
+    locPrecisions = np.stack(locPrecisions, axis=0)
+    locPRs = {'recallThrs':recallThrs, 
+              'locPrecisions':locPrecisions,
+              'locAPs': locAPs,
+              'locAP50': locAP50,
+              'locAPDict':locAPDict, 
+              'locAP50Dict': locAP50Dict,
+              'loc_thrsh_at_prec':locThrshAtPrec, 
+              'loc_thrsh_at_rec':locThrshAtRec, 
+              'classes': locClasses # remove background
+             }
+                
+    return locPRs
+    ########################################################################
+
+
+def _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.8, 0.75, 0.7], recList=[0.5]):
     def _get_thr_ind(coco_eval, thr):
         ind = np.where((coco_eval.params.iouThrs > thr - 1e-5) &
                        (coco_eval.params.iouThrs < thr + 1e-5))[0][0]
@@ -292,8 +428,8 @@ def _log_detection_eval_metrics(json_dataset, coco_eval):
     clsAPDict = {}
     clsAP50Dict= {}
     clsWAP50Dict = {}
-    precList = [0.9]
-    recList = [0.5]
+    #     precList = [0.9, 0.85, 0.8]
+    #     recList = [0.5]
     clsThrshAtPrec = {}
     clsNum = len(json_dataset.classes)
     for p in precList:

@@ -112,6 +112,7 @@ def parse_args():
         parser.print_help()
         sys.exit(1)
     ret = parser.parse_args()
+    print ("ret.out_dir = {}".format(ret.out_dir))
     ret.out_dir = os.path.abspath(ret.out_dir)
     if ret.device == 'gpu' and ret.use_nnpack:
         logger.warn('Should not use mobile engine for gpu model.')
@@ -404,11 +405,11 @@ def _save_models(all_net, all_init_net, args):
     if not os.path.exists(args.out_dir):
         os.makedirs(args.out_dir)
 
-    with open(os.path.join(args.out_dir, fname + '.pb'), 'w') as f:
+    with open(os.path.join(args.out_dir, fname + '.pb'), 'wb') as f:
         f.write(all_net.Proto().SerializeToString())
     with open(os.path.join(args.out_dir, fname + '.pbtxt'), 'w') as f:
         f.write(str(all_net.Proto()))
-    with open(os.path.join(args.out_dir, fname + '_init.pb'), 'w') as f:
+    with open(os.path.join(args.out_dir, fname + '_init.pb'), 'wb') as f:
         f.write(all_init_net.Proto().SerializeToString())
 
     _save_image_graphs(args, all_net, all_init_net)

@@ -93,6 +93,13 @@ def parse_args():
         '--cls_thrsh_file', dest='cls_thrsh_file', help='image or folder of images', default=None
     )
     parser.add_argument(
+        '--thresh',
+        dest='thresh',
+        help='detection prob thresh1old for all classes',
+        default=0.5,
+        type=float
+    )
+    parser.add_argument(
         '--class_list_file',
         dest='class_list_file',
         help='class_list_file',
@@ -101,6 +108,12 @@ def parse_args():
     )
     parser.add_argument(
         '--datasetName', dest='datasetName', help='datasetName', default=None
+    )
+    parser.add_argument(
+        'opts',
+        help='See detectron/core/config.py for all options',
+        default=None,
+        nargs=argparse.REMAINDER
     )
     if len(sys.argv) == 1:
         parser.print_help()
@@ -141,7 +154,7 @@ def main(args):
     cfg.NUM_GPUS = 1
     vis = True #False 
     shuffleList = False
-    thresh = 0.5
+    thresh = args.thresh
     dataset = JsonDataset(datasetName) if args.datasetName is not None else None
     classes_list = None
     if args.cls_thrsh_file is not None:
@@ -172,7 +185,7 @@ def main(args):
     if osp.isdir(args.im_or_folder):
         if args.im_list is None:
             im_list = glob.glob(args.im_or_folder + '/*.' + args.image_ext)
-            im_list = [osp.basename(n) for n in im_list]
+            #im_list = [osp.basename(n) for n in im_list]
         else:
             im_list = [l.rstrip().split('\t')[0].split('.')[0] + '.jpg' for l in open(args.im_list, 'r').readlines()]
             im_list = [osp.join(args.im_or_folder, n) for n in im_list]
@@ -224,4 +237,5 @@ if __name__ == '__main__':
     workspace.GlobalInit(['caffe2', '--caffe2_log_level=0'])
     detectron.utils.logging.setup_logging(__name__)
     args = parse_args()
+    print (args)
     main(args)
