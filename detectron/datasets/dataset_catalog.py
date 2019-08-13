@@ -52,6 +52,18 @@ _DATASETS = {
         _ANN_FN:
             _DATA_DIR + '/Fashion_VI_detectron/json_annotations/Fashion_VI_All_annotations_train.json'
     },
+    'GOD_Open800k_train': {
+        _IM_DIR:
+            '/data/chnxi/',
+        _ANN_FN:
+            '/data/chnxi/GOD/json_annotations/GOD_Open800k_train_annotations.json'
+    },
+    'GOD_Open40k_train': {
+        _IM_DIR:
+            '/data/chnxi/',
+        _ANN_FN:
+            '/data/chnxi/GOD/json_annotations/GOD_Open40k_train_annotations.json'
+    },
     'GOD_train': {
         _IM_DIR:
             '/data/chnxi/',
@@ -81,6 +93,12 @@ _DATASETS = {
             _DATA_DIR + '/coco/val2014',
         _ANN_FN:
             _GOD_DATA_DIR + '/json_annotations/val/COCO_91_val_annotations.json'
+    },
+    'Fashion_HF_VI_train': {
+        _IM_DIR:
+            _DATA_DIR + '/',
+        _ANN_FN:
+            _DATA_DIR + '/Fashion_HF_VI/json_annotations/Fashion_HF_VI_annotations_All.json'
     },
     
     'HF_Fashion_VI_train': {

@@ -1,0 +1,33 @@
+#!/bin/bash
+set -eu
+# GPUS=$1
+
+BASE_LR=0.01
+IMS_PER_BATCH=2
+MAX_ITER=900000
+TRAINSET=GOD_Open800k_train
+
+
+# BASE_LR=0.02
+# IMS_PER_BATCH=2
+# MAX_ITER=1600000
+
+# BASE_LR=0.02
+# IMS_PER_BATCH=4
+# MAX_ITER=800000
+
+JOB_NAME=retr50_bs_$IMS_PER_BATCH-iter_$MAX_ITER-lr_$BASE_LR
+OUTPUT_DIR=/data/chnxi/GOD/Models/$TRAINSET/$JOB_NAME/
+
+echo $JOB_NAME
+
+# CUDA_VISIBLE_DEVICES="$GPUS" 
+python tools/train_net.py \
+    --cfg configs/GOD/retinanet_R-50-FPN_8gpu.yaml \
+    NUM_GPUS 8 \
+    TRAIN.DATASETS "('$TRAINSET', )" \
+    SOLVER.BASE_LR $BASE_LR \
+    SOLVER.MAX_ITER  $MAX_ITER \
+    TRAIN.IMS_PER_BATCH $IMS_PER_BATCH \
+    OUTPUT_DIR $OUTPUT_DIR \
+    | tee $OUTPUT_DIR/$JOB_NAME.log
