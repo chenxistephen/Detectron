@@ -6,8 +6,9 @@ GPUS=$1
 NUM_GPUS=$2
 MODEL_NAME=$3 #fashionv3_retr50_iter360000_lr0.005_alpha0.5_gamma2.0
 SCALE=400 #$7 # TEST SCALE
-
-SOFTNMS=True
+START_ID=1000
+END_ID=2000
+SOFTNMS=False
 
 MODEL_PATH=/media/data/chnxi/FashionV3/Models
 
@@ -15,19 +16,19 @@ MODEL_PATH=/media/data/chnxi/FashionV3/Models
 #MODEL_NAME=scale"$TRAINSCALE"_iter90000_alpha"$ALPHA"_gamma"$GAMMA"_lr"$LR"_body"$BODY"
 
 echo $MODEL_NAME
-echo "Test Scale =" $SCALE
 
 
 CUDA_VISIBLE_DEVICES="$GPUS" python tools/test_net.py \
-    --cfg configs/FashionV3/retinanet_R-50-FPN_2x_gn.yaml \
+    --cfg configs/FashionV3/fashion_hf_vi_167_retinanet.yaml \
     --eval_test \
     --multi-gpu-testing \
     TEST.WEIGHTS $MODEL_PATH/$MODEL_NAME/model_final.pkl \
     OUTPUT_DIR $MODEL_PATH/$MODEL_NAME/Test_$SCALE-SoftNMS-$SOFTNMS \
-    TEST.DATASETS "('bing5k_fashion', )" \
+    TEST.DATASETS "('FashionV2_val', )" \
     TEST.SOFT_NMS.ENABLED $SOFTNMS \
     NUM_GPUS $NUM_GPUS \
     TEST.SCALE $SCALE \
     | tee logs/eval_$MODEL_NAME-Test_$SCALE.log
     #--range $START_ID $END_ID \
-    # TEST.DATASETS "('FashionV2_val', 'bing5k_fashion',)" \
+    #TEST.DATASETS "('FashionV2_val', 'bing5k_fashion',)" \
+    #--multi-gpu-testing \

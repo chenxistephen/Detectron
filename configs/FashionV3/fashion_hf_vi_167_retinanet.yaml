@@ -1,12 +1,12 @@
 MODEL:
   TYPE: retinanet
   CONV_BODY: FPN.add_fpn_ResNet50_conv5_body
-  NUM_CLASSES: 111 #167 #59
-NUM_GPUS: 4 #8
+  NUM_CLASSES: 167 #111 #167 #59
+NUM_GPUS: 8
 SOLVER:
   WEIGHT_DECAY: 0.0001
   LR_POLICY: steps_with_decay
-  BASE_LR: 0.005 #0.01
+  BASE_LR: 0.01
   GAMMA: 0.1
   MAX_ITER: 180000 #90000
   STEPS: [0, 120000, 160000] #[0, 60000, 80000]
@@ -27,7 +27,7 @@ RETINANET:
   LOSS_ALPHA: 0.25
 TRAIN:
   WEIGHTS: https://dl.fbaipublicfiles.com/detectron/ImageNetPretrained/MSRA/R-50.pkl
-  DATASETS: ('Fashion_VI_train',)
+  DATASETS: ('Fashion_HF_VI_train',)
   SCALES: (400,)
   MAX_SIZE: 667 #1333
   RPN_STRADDLE_THRESH: -1  # default 0

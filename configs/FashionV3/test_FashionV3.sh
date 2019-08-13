@@ -5,10 +5,10 @@ set -eu
 GPUS=$1
 NUM_GPUS=$2
 MODEL_NAME=$3 #fashionv3_retr50_iter360000_lr0.005_alpha0.5_gamma2.0
-SCALE=600 #$7 # TEST SCALE
+SCALE=400 #$7 # TEST SCALE
 START_ID=1000
 END_ID=2000
-SOFTNMS=True
+SOFTNMS=False
 
 MODEL_PATH=/media/data/chnxi/FashionV3/Models
 

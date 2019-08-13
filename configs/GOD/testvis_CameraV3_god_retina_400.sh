@@ -16,16 +16,16 @@ OUTPUT_DIR=$MODEL_PATH/$MODEL_NAME/Test_$SCALE
 echo $MODEL_NAME
 
 
-CUDA_VISIBLE_DEVICES="$GPUS" python tools/test_net.py \
-    --cfg configs/GOD/retinanet_R-50-FPN_8gpu.yaml \
-    --multi-gpu-testing \
-    TEST.WEIGHTS $MODEL_PATH/$MODEL_NAME/model_final.pkl \
-    OUTPUT_DIR $OUTPUT_DIR \
-    TEST.DATASETS "('CameraV3_GOD', 'bing5k_GOD')" \
-    NUM_GPUS $NUM_GPUS \
-    TEST.SCALE $SCALE \
-    USE_NCCL True \
-    | tee logs/eval_$MODEL_NAME-Test_$SCALE.log
+# CUDA_VISIBLE_DEVICES="$GPUS" python tools/test_net.py \
+#     --cfg configs/GOD/retinanet_R-50-FPN_8gpu.yaml \
+#     --multi-gpu-testing \
+#     TEST.WEIGHTS $MODEL_PATH/$MODEL_NAME/model_final.pkl \
+#     OUTPUT_DIR $OUTPUT_DIR \
+#     TEST.DATASETS "('CameraV3_GOD', 'bing5k_GOD')" \
+#     NUM_GPUS $NUM_GPUS \
+#     TEST.SCALE $SCALE \
+#     USE_NCCL True \
+#     | tee logs/eval_$MODEL_NAME-Test_$SCALE.log
     #--range 1000 2000 \
     #--multi-gpu-testing \
     #--eval_test \
