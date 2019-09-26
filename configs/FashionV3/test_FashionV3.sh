@@ -24,7 +24,7 @@ CUDA_VISIBLE_DEVICES="$GPUS" python tools/test_net.py \
     --multi-gpu-testing \
     TEST.WEIGHTS $MODEL_PATH/$MODEL_NAME/model_final.pkl \
     OUTPUT_DIR $MODEL_PATH/$MODEL_NAME/Test_$SCALE-SoftNMS-$SOFTNMS \
-    TEST.DATASETS "('FashionV2_val', )" \
+    TEST.DATASETS "('FashionV2_val', 'bing5k_fashion',)" \
     TEST.SOFT_NMS.ENABLED $SOFTNMS \
     NUM_GPUS $NUM_GPUS \
     TEST.SCALE $SCALE \

@@ -24,7 +24,7 @@ import os
 
 
 # Path to data dir
-_DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
+_DATA_DIR = '/ssddata-multimedia/chnxi' #os.path.join(os.path.dirname(__file__), 'data')
 
 # Required dataset entry keys
 _IM_DIR = 'image_directory'
@@ -35,16 +35,16 @@ _IM_PREFIX = 'image_prefix'
 _DEVKIT_DIR = 'devkit_directory'
 _RAW_DIR = 'raw_dir'
 
-_GOD_DATA_DIR = '/media/data/chnxi/GOD/'
-_MNT_DATA_DIR = '/media/data/chnxi/'
+_GOD_DATA_DIR = _DATA_DIR + '/GOD/'
+_MNT_DATA_DIR = '/data/users/chnxi/'
 
 # Available datasets
 _DATASETS = {
     'CameraV3_GOD': {
         _IM_DIR:
-            _MNT_DATA_DIR + '/CameraMeasurementSetV3/',
+            _DATA_DIR + '/CameraMeasurementSetV3/',
         _ANN_FN:
-            _MNT_DATA_DIR + '/CameraMeasurementSetV3/json_annotations/CameraV3_GOD_annotations.json'
+            _DATA_DIR + '/CameraMeasurementSetV3/json_annotations/CameraV3_GOD_annotations.json'
     },
     'Fashion_VI_train': {
         _IM_DIR:
@@ -54,19 +54,19 @@ _DATASETS = {
     },
     'GOD_Open800k_train': {
         _IM_DIR:
-            '/data/chnxi/',
+            _DATA_DIR,
         _ANN_FN:
-            '/data/chnxi/GOD/json_annotations/GOD_Open800k_train_annotations.json'
+            _DATA_DIR + '/GOD/json_annotations/GOD_Open800k_train_annotations.json'
     },
-    'GOD_Open40k_train': {
+    'GOD_Open400k_train': {
         _IM_DIR:
-            '/data/chnxi/',
+            _DATA_DIR,
         _ANN_FN:
-            '/data/chnxi/GOD/json_annotations/GOD_Open40k_train_annotations.json'
+            '/data/chnxi/GOD/json_annotations/GOD_Open400k_train_annotations.json'
     },
     'GOD_train': {
         _IM_DIR:
-            '/data/chnxi/',
+            _DATA_DIR,
         _ANN_FN:
             '/data/chnxi/GOD/json_annotations/GOD_train_annotations.json'
     },
