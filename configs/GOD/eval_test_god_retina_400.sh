@@ -6,7 +6,7 @@ GPUS=$1
 NUM_GPUS=$2
 MODEL_NAME=$3 #god_frcnn_tuneiter_1000000_try6_nonccl
 SCALE=400 #$7 # TEST SCALE
-SOFTNMS=True
+SOFTNMS=False
 MODEL_PATH=/media/data/chnxi/GOD/Models
 
 
@@ -22,12 +22,14 @@ CUDA_VISIBLE_DEVICES="$GPUS" python tools/test_net.py \
     --multi-gpu-testing \
     TEST.WEIGHTS $MODEL_PATH/$MODEL_NAME/model_final.pkl \
     OUTPUT_DIR $MODEL_PATH/$MODEL_NAME/Test_$SCALE-SoftNMS-$SOFTNMS \
-    TEST.DATASETS "('GOD_FashionV2_val','GOD_furniture_val','GOD_coco_2014_minival','GOD_OpenImage_val')" \
     TEST.SOFT_NMS.ENABLED $SOFTNMS \
+    TEST.DATASETS "('GOD_FashionV2_val','GOD_furniture_val','GOD_coco_2014_minival','GOD_OpenImage_val', )" \
     NUM_GPUS $NUM_GPUS \
     TEST.SCALE $SCALE \
     USE_NCCL True \
-    | tee logs/GOD/eval_$MODEL_NAME-Test_$SCALE-SoftNMS-$SOFTNMS.log
+    | tee $MODEL_PATH/$MODEL_NAME/eval.log
     #--range 1000 2000 \
     #--multi-gpu-testing \
     # --compute_loc_pr \
+    #TEST.DATASETS "('GOD_FashionV2_val','GOD_furniture_val','GOD_coco_2014_minival','GOD_OpenImage_val')" \
+

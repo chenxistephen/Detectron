@@ -83,20 +83,22 @@ class JsonDataset(object):
         if 'subset_categories' in self.COCO.dataset:
             self.subset_categories = [c['name'] for c in self.COCO.dataset['subset_categories']]
             self.subset_category_ids = [c['id'] for c in self.COCO.dataset['subset_categories']]
-            print ("self.subset_category_ids = {}".format(self.subset_category_ids))
+            #print ("self.subset_category_ids = {}".format(self.subset_category_ids))
             ##############################################################################
             # Stephen: add classwise instance count and weights for subset category weighted AP
             inst_sub_cats = [a['category_id'] for a in self.COCO.dataset['annotations'] if a['category_id'] in self.subset_category_ids]
             C_sub = Counter(inst_sub_cats)
             self.subset_category_weights = np.array([C_sub[cid] for i, cid in enumerate(self.subset_category_ids)])
-            self.subset_category_weights = self.category_weights / len(inst_sub_cats)
+            self.subset_category_weights = self.subset_category_weights / len(inst_sub_cats)
             print ("# inst of all categories = {}, # inst of subcategories = {}".format(len(inst_cats), len(inst_sub_cats)))
+            #             subset_cat_weights = dict(zip(self.subset_categories, self.subset_category_weights))
+            #             print ("subset_cat_weights = {}".format(subset_cat_weights))
+            print ("self.subset_category_weights sum = {}".format(sum(self.subset_category_weights)))
         else:
             self.subset_categories = None
             self.subset_category_ids = None
             self.subset_category_weights = None
-        print ("self.subset_categories = {}".format(self.subset_categories))
-        print ("self.subset_category_weights = {}, sum = {}".format(self.subset_categories, sum(self.subset_category_weights)))
+        #print ("self.subset_categories = {}".format(self.subset_categories))
         ##############################################################################
         self.json_category_id_to_contiguous_id = {
             v: i + 1
@@ -201,6 +203,8 @@ class JsonDataset(object):
         height = entry['height']
         for obj in objs:
             # crowd regions are RLE encoded
+            if 'segmentation' not in obj:
+                obj['segmentation'] = []
             if segm_utils.is_poly(obj['segmentation']):
                 # Valid polygons have >= 3 points, so require >= 6 coordinates
                 obj['segmentation'] = [

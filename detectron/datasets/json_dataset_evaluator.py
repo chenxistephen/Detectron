@@ -193,7 +193,8 @@ def _coco_bbox_results_one_category(json_dataset, boxes, cat_id):
         dets = boxes[i]
         if isinstance(dets, list) and len(dets) == 0:
             continue
-        dets = dets.astype(np.float)
+        #dets = dets.astype(np.float)
+        dets = np.array(dets, dtype=np.float)
         scores = dets[:, -1]
         xywh_dets = box_utils.xyxy_to_xywh(dets[:, 0:4])
         xs = xywh_dets[:, 0]
@@ -306,10 +307,8 @@ def _log_localization_eval_metrics(coco_eval, fgclass='foreground', precList = [
     locPrecisions = []
     locAPs = []
     locAP50 = []
-    locWAP50 = []
     locAPDict = {}
     locAP50Dict= {}
-    locWAP50Dict = {}
     #     precList = [0.9, 0.85, 0.8, 0.75, 0.7]
     #     recList = [0.4]
     locThrshAtPrec = {}
@@ -424,10 +423,8 @@ def _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.
     clsPrecisions = []
     clsAPs = []
     clsAP50 = []
-    clsWAP50 = []
     clsAPDict = {}
     clsAP50Dict= {}
-    clsWAP50Dict = {}
     #     precList = [0.9, 0.85, 0.8]
     #     recList = [0.5]
     clsThrshAtPrec = {}
@@ -470,7 +467,6 @@ def _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.
             ind_lo, :, cls_ind - 1, 0, 2]
         clsPrecisions.append(cls_precision)
         ap50 = np.mean(cls_precision[cls_precision > -1])
-        wap50 = ap50 * json_dataset.category_weights[cls_ind - 1]
         ########################################################################
         # Compute scores at precision/recall
         # print ("class {}: cls_precision= {}".format(cls, cls_precision))
@@ -493,10 +489,8 @@ def _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.
         ap = np.mean(precision[precision > -1])
         clsAPs.append(ap)
         clsAP50.append(ap50)
-        clsWAP50.append(wap50)
         clsAPDict[cls] = ap
         clsAP50Dict[cls] = ap50
-        clsWAP50Dict[cls] = wap50
         logger.info('{}: {:.1f}'.format(cls, 100 * ap))
     logger.info('~~~~ Summary metrics ~~~~')
     coco_eval.summarize()
@@ -507,10 +501,8 @@ def _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.
               'clsPrecisions':clsPrecisions,
               'clsAPs': clsAPs,
               'clsAP50': clsAP50,
-              'clsWAP50': clsWAP50,
               'clsAPDict':clsAPDict, 
               'clsAP50Dict': clsAP50Dict,
-              'clsWAP50Dict': clsWAP50Dict,
               'cls_thrsh_at_prec':clsThrshAtPrec, 
               'cls_thrsh_at_rec':clsThrshAtRec, 
               'classes': json_dataset.classes[1:] # remove background

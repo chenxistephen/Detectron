@@ -102,11 +102,16 @@ def parse_args():
     return args
 
 import numpy as np
-def vis(dataset, detections_pkl, thresh, output_dir, sampleNum=None, class_list_file=None):
+def vis(dataset, detections_pkl, thresh, output_dir, sampleNum=None, class_list_file=None, rm_prev=True):
+    if rm_prev:
+        command = 'rm -r {}'.format(output_dir)
+        print (command)
+        os.system(command)
     ds = JsonDataset(dataset)
     #classes_list = [l.rstrip() for l in open('/home/chnxi/data/HomeFurniture/taxonomy/furniture_58_labels.txt','r').readlines()]
+    #classes_list = [l.rstrip().split('\t')[0].split('\\')[-1] for l in open(class_list_file,'r').readlines()]
     if class_list_file is not None:
-        classes_list = [l.rstrip().split('\t')[0].split('\\')[-1] for l in open(class_list_file,'r').readlines()]
+        classes_list = [l.rstrip().split('\t')[1].split('/')[-1] for l in open(class_list_file,'r').readlines()[1:]]
     else:
         classes_list = ds.classes
     classes_list = ['background'] + classes_list
@@ -148,11 +153,10 @@ def vis(dataset, detections_pkl, thresh, output_dir, sampleNum=None, class_list_
         
     #for ix, entry in enumerate(roidb):
     for ii, id_in_pkl in enumerate(ids_in_pkl):
-        img_id = pkl_img_ids[id_in_pkl]
-        entry = roidb[img_id]
         if ii % 10 == 0:
             print('{:d}/{:d}'.format(ii + 1, len(ids_in_pkl)))
-
+        img_id = pkl_img_ids[id_in_pkl]
+        entry = roidb[img_id]
         im = cv2.imread(entry['image'])
         im_name = os.path.splitext(os.path.basename(entry['image']))[0]
 

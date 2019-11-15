@@ -337,7 +337,8 @@ def test_net(
                 thresh=cfg.VIS_TH,
                 box_alpha=0.8,
                 dataset=dataset,
-                show_class=True
+                show_class=True,
+                ext='png'
             )
 
     cfg_yaml = envu.yaml_dump(cfg)

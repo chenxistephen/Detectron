@@ -26,9 +26,9 @@ echo $MODEL_NAME
 #     TEST.SCALE $SCALE \
 #     USE_NCCL True \
 #     | tee logs/eval_$MODEL_NAME-Test_$SCALE.log
-    #--range 1000 2000 \
-    #--multi-gpu-testing \
-    #--eval_test \
+#     --range 1000 2000 \
+#     --multi-gpu-testing \
+#     --eval_test \
 
 #########################################################
 TESTSET=CameraV3_GOD

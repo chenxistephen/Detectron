@@ -22,6 +22,7 @@ CUDA_VISIBLE_DEVICES="$GPUS" python tools/test_net.py \
     --cfg configs/FashionV3/fashion_vi_110_retinanet.yaml \
     --eval_test \
     --multi-gpu-testing \
+    --compute_loc_pr \
     TEST.WEIGHTS $MODEL_PATH/$MODEL_NAME/model_final.pkl \
     OUTPUT_DIR $MODEL_PATH/$MODEL_NAME/Test_$SCALE-SoftNMS-$SOFTNMS \
     TEST.DATASETS "('FashionV2_val', )" \
@@ -32,3 +33,4 @@ CUDA_VISIBLE_DEVICES="$GPUS" python tools/test_net.py \
     #--range $START_ID $END_ID \
     #TEST.DATASETS "('FashionV2_val', 'bing5k_fashion',)" \
     #--multi-gpu-testing \
+    # --compute_loc_pr

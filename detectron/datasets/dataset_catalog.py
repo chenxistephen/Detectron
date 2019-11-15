@@ -24,7 +24,7 @@ import os
 
 
 # Path to data dir
-_DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
+_DATA_DIR = '/media/data/chnxi/' #os.path.join(os.path.dirname(__file__), 'data')
 
 # Required dataset entry keys
 _IM_DIR = 'image_directory'
@@ -36,15 +36,27 @@ _DEVKIT_DIR = 'devkit_directory'
 _RAW_DIR = 'raw_dir'
 
 _GOD_DATA_DIR = '/media/data/chnxi/GOD/'
-_MNT_DATA_DIR = '/media/data/chnxi/'
+_DATA_DIR = '/media/data/chnxi/'
 
 # Available datasets
 _DATASETS = {
     'CameraV3_GOD': {
         _IM_DIR:
-            _MNT_DATA_DIR + '/CameraMeasurementSetV3/',
+            _DATA_DIR + '/CameraMeasurementSetV3/',
         _ANN_FN:
-            _MNT_DATA_DIR + '/CameraMeasurementSetV3/json_annotations/CameraV3_GOD_annotations.json'
+            _DATA_DIR + '/CameraMeasurementSetV3/json_annotations/CameraV3_GOD_V1_annotations.json'
+    },
+    'Object365_train': {
+        _IM_DIR:
+            _DATA_DIR + '/Object365/train/',
+        _ANN_FN:
+            _DATA_DIR + '/Object365/json_annotations/objects365_train.json'
+    },
+    'Object365_val': {
+        _IM_DIR:
+            _DATA_DIR + '/Object365/val/',
+        _ANN_FN:
+            _DATA_DIR + '/Object365/json_annotations/objects365_val_TrainCategs.json'
     },
     'Fashion_VI_train': {
         _IM_DIR:
@@ -74,25 +86,31 @@ _DATASETS = {
         _IM_DIR:
             _DATA_DIR + '/FashionV2/Images',
         _ANN_FN:
-            _GOD_DATA_DIR + '/json_annotations/val/FashionV2_val_annotations.json'
+            _GOD_DATA_DIR + '/json_annotations/val/GOD_FashionV2_val_annotations.json'
     },
     'GOD_furniture_val': {
         _IM_DIR:
             _DATA_DIR + '/HomeFurniture/Images',
         _ANN_FN:
-            _GOD_DATA_DIR + '/json_annotations/val/HomeFurniture_val_annotations.json'
+            _GOD_DATA_DIR + '/json_annotations/val/GOD_HomeFurniture_val_annotations.json'
     },
     'GOD_OpenImage_val': {
         _IM_DIR:
             _DATA_DIR + '/OpenImage/validation_images',
         _ANN_FN:
-            _GOD_DATA_DIR + '/json_annotations/val/OpenImage_val_annotations.json'
+            _GOD_DATA_DIR + '/json_annotations/val/GOD_OpenImage_val_annotations.json'
+    },
+    'GOD_Object365_val': {
+        _IM_DIR:
+            _DATA_DIR + '/Object365/val',
+        _ANN_FN:
+            _GOD_DATA_DIR + '/json_annotations/val/GOD_Object365_val_annotations.json'
     },
     'GOD_coco_2014_minival': {
         _IM_DIR:
             _DATA_DIR + '/coco/val2014',
         _ANN_FN:
-            _GOD_DATA_DIR + '/json_annotations/val/COCO_91_val_annotations.json'
+            _GOD_DATA_DIR + '/json_annotations/val/GOD_COCO_91_val_annotations.json'
     },
     'Fashion_HF_VI_train': {
         _IM_DIR:
@@ -147,7 +165,7 @@ _DATASETS = {
         _IM_DIR:
             _DATA_DIR + '/FashionV2/Images',
         _ANN_FN:
-            _MNT_DATA_DIR + '/FashionV3/json_annotations/HF_on_Fashion_val_annotations.json'
+            _DATA_DIR + '/FashionV3/json_annotations/HF_on_Fashion_val_annotations.json'
     },
     'FashionV2_val': {
         _IM_DIR:
@@ -195,7 +213,7 @@ _DATASETS = {
         _IM_DIR:
             _DATA_DIR + '/BingMeasurement_5k/Images',
         _ANN_FN:
-            _DATA_DIR + '/BingMeasurement_5k/json_annotations/GOD_annotations.json'
+            _DATA_DIR + '/BingMeasurement_5k/json_annotations/GOD_V1_annotations.json'
     },
     'bing5k_fashion': {
         _IM_DIR:

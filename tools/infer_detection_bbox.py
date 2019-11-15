@@ -165,7 +165,8 @@ def main(args):
         class_thresholds = None
     
     if args.class_list_file is not None:
-        classes_list = [l.rstrip().split('\t')[0].split('\\')[-1] for l in open(args.class_list_file,'r').readlines()]
+        classes_list = [l.rstrip().split('\t')[-1].split('/')[-1] for l in open(args.class_list_file,'r').readlines()[1:]]
+        #classes_list = [l.rstrip().split('\t')[0].split('\\')[-1] for l in open(args.class_list_file,'r').readlines()]
     elif dataset is not None:
         classes_list = dataset.classes
 
