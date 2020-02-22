@@ -216,7 +216,8 @@ def _write_dict_to_tsv(d, filename, title=None):
             fout.write('{}\t{}\n'.format(k,v))
 
 
-def _do_detection_eval(json_dataset, res_file, output_dir, computeLocPR=False):
+def _do_detection_eval(json_dataset, res_file, output_dir, 
+        computeLocPR=False, precList=[0.9, 0.85, 0.8, 0.75, 0.7]):
     loadtime = Timer()
     loadtime.tic()
     coco_dt = json_dataset.COCO.loadRes(str(res_file))
@@ -247,7 +248,7 @@ def _do_detection_eval(json_dataset, res_file, output_dir, computeLocPR=False):
     coco_eval.params.useCats = 1
     coco_eval.evaluate()
     coco_eval.accumulate()
-    clsPRs = _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.8, 0.75, 0.7])
+    clsPRs = _log_detection_eval_metrics(json_dataset, coco_eval, precList=precList)
     clsAP50Dict = clsPRs['clsAP50Dict']
     #clsWAP50Dict = clsPRs['clsWAP50Dict']
 

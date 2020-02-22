@@ -7,9 +7,8 @@ MODEL_PATH=/media/data/chnxi/FashionV3/Models
 
 #MODEL_NAME=FashionVI-GN_400_8gpu_iter_180000-lr_0.01-alpha_0.5-gamma_2.
 
-#MODEL_NAME=fashionv3_retr50_iter360000_lr0.005_alpha0.5_gamma2.0
-
 MODEL_NAME=Fashion_HF_VI/bs2-iter_300000-lr_0.01-alpha_0.25-gamma_2
+#MODEL_NAME=fashionv3_retr50_iter360000_lr0.005_alpha0.5_gamma2.0
 
 SOFTNMS=False
 SCALE=400

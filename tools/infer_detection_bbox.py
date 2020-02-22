@@ -47,6 +47,7 @@ import detectron.utils.c2 as c2_utils
 import detectron.utils.logging
 import detectron.utils.vis as vis_utils
 import os.path as osp
+import pickle
 c2_utils.import_detectron_ops()
 # OpenCL may be enabled by default in OpenCV3; disable it because it's not
 # thread safe and causes unwanted GPU memory allocations.
@@ -75,6 +76,9 @@ def parse_args():
         help='directory for visualization pdfs (default: /tmp/infer_simple)',
         default='/tmp/infer_simple',
         type=str
+    )
+    parser.add_argument(
+        '--pkl_file', dest='pkl_file', default=None, type=str
     )
     parser.add_argument(
         '--image-ext',
@@ -115,9 +119,9 @@ def parse_args():
         default=None,
         nargs=argparse.REMAINDER
     )
-    if len(sys.argv) == 1:
-        parser.print_help()
-        sys.exit(1)
+    # if len(sys.argv) == 1:
+    #     parser.print_help()
+    #     sys.exit(1)
     return parser.parse_args()
     
 import numpy as np
@@ -147,6 +151,14 @@ def checkMkdir(dir):
     if not osp.isdir(dir):
         os.makedirs(dir)
 
+def extend_results(index, all_res, im_res):
+    """Add results for an image to the set of all results at the specified
+    index.
+    """
+    # Skip cls_idx 0 (__background__)
+    for cls_idx in range(1, len(im_res)):
+        all_res[cls_idx][index] = im_res[cls_idx]
+
 def main(args):
     #datasetName = 'logo_1048_test' #'furniture_val'
     logger = logging.getLogger(__name__)
@@ -165,7 +177,7 @@ def main(args):
         class_thresholds = None
     
     if args.class_list_file is not None:
-        classes_list = [l.rstrip().split('\t')[-1].split('/')[-1] for l in open(args.class_list_file,'r').readlines()[1:]]
+        classes_list = [l.rstrip().split('\t')[0].split('/')[-1] for l in open(args.class_list_file,'r').readlines()]
         #classes_list = [l.rstrip().split('\t')[0].split('\\')[-1] for l in open(args.class_list_file,'r').readlines()]
     elif dataset is not None:
         classes_list = dataset.classes
@@ -197,6 +209,15 @@ def main(args):
         shuffle(im_list)
         
     checkMkdir(args.output_dir)
+
+    ###################################################
+    ## all_boxes: saves all results:
+    num_images = len(im_list)
+    num_classes = len(classes_list)
+    all_boxes = [[[] for _ in range(num_images)] for _ in range(num_classes)]
+    ###################################################
+
+
     for img_id, im_name in enumerate(im_list):
         im = cv2.imread(im_name)
         if im is None:
@@ -216,6 +237,8 @@ def main(args):
             )
         if (img_id + 1) % 100 == 0:
             print ("{}/{}".format(img_id+1, len(im_list)))
+        
+        extend_results(img_id, all_boxes, cls_boxes)
 
         if vis:
             vis_utils.vis_one_image(
@@ -229,14 +252,44 @@ def main(args):
                 box_alpha=0.8,
                     dataset=dataset,
                 show_class=True, 
-                ext='.png', 
+                ext='png', 
                 classes_list=classes_list
             )
+    if args.pkl_file is not None:
+        print ("Saving all_boxes to {}".format(args.pkl_file))
+        with open(args.pkl_file, 'wb') as f:
+            pickle.dump(all_boxes, f, 2)
 
 
 if __name__ == '__main__':
     workspace.GlobalInit(['caffe2', '--caffe2_log_level=0'])
     detectron.utils.logging.setup_logging(__name__)
     args = parse_args()
+    # For debug:
+    model_dict = {'HF': {'MODEL_PATH': "Trained_Models/HomeFurniture/V1_Shipping/", "MODEL_NAME": "", 
+                          "cfg": "configs/HomeFurniture/hf_fashion_vi_retinanet.yaml", 
+                          "class_list": '/media/data/chnxi/HomeFurniture/taxonomy/furniture_58_labels.txt'}, 
+                 'GOD': {'MODEL_PATH':'/media/data/chnxi/GOD/Models/', 'MODEL_NAME': 'Open800k_580/frcnn_8gpuxbs2-iter_1600000-lr_0.02', 
+                         'cfg':'configs/GOD/e2e_faster_rcnn_R-50-FPN_8gpu.yaml', 
+                         'class_list': '/media/data/chnxi/GOD/taxonomy/GOD_V1.1_labels.txt'},
+           'FashionV3': {'MODEL_PATH': "Trained_Models/FashionV3/", "MODEL_NAME": "V3_Shipping", 
+                         'cfg': 'Trained_Models/FashionV3/V3_Shipping/fashion_hf_vi_167_retinanet.yaml',
+                         'class_list': '/media/data/chnxi/FashionV3/taxonomy/fashion_furniture_visualintent_166_labels.txt'}}
+    modelType = 'FashionV3'
+    MODEL_PATH = model_dict[modelType]['MODEL_PATH'] 
+    MODEL_NAME = model_dict[modelType]['MODEL_NAME'] 
+    args.cfg = model_dict[modelType]['cfg']
+    args.class_list_file=  model_dict[modelType]['class_list']
+    model_folder = osp.join(MODEL_PATH, MODEL_NAME)
+    output_folder = osp.join(model_folder, 'CamV3')
+    
+    #"configs/GOD/e2e_faster_rcnn_R-50-FPN_8gpu.yaml"
+    args.weights= osp.join(model_folder, 'model_final.pkl')
+    args.output_dir=osp.join(output_folder, 'visualizations')
+    args.pkl_file = osp.join(output_folder, 'all_boxes.pkl')
+    args.im_list = '/media/data/chnxi/CameraMeasurementSetV3/camera_set_v3_imglist.tsv'
+    args.im_or_folder='/media/data/chnxi/CameraMeasurementSetV3'
+    #'/media/data/chnxi/GOD/taxonomy/GOD_V1.1_labels.txt'
+    #############
     print (args)
     main(args)

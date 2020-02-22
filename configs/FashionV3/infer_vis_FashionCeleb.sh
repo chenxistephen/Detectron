@@ -6,7 +6,8 @@ NUM_GPUS=1
 SCALE=400
 SOFTNMS=False
 
-MODEL_NAME=Fashion_HF_VI/bs2-iter_300000-lr_0.01-alpha_0.25-gamma_2
+MODEL_NAME=
+#Fashion_HF_VI/bs2-iter_300000-lr_0.01-alpha_0.25-gamma_2
 #fashionv3_retr50_iter360000_lr0.005_alpha0.5_gamma2.0
 ###############################################################################################
 MODEL_PATH=/media/data/chnxi/FashionV3/Models/
