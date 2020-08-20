@@ -6,7 +6,7 @@ NUM_GPUS=1
 SCALE=400
 SOFTNMS=False
 
-MODEL_NAME=
+MODEL_NAME=Final_Shipping_Candidate
 #Fashion_HF_VI/bs2-iter_300000-lr_0.01-alpha_0.25-gamma_2
 #fashionv3_retr50_iter360000_lr0.005_alpha0.5_gamma2.0
 ###############################################################################################
@@ -25,7 +25,7 @@ CUDA_VISIBLE_DEVICES="$GPUS" python tools/infer_detection_bbox.py \
     --image-ext jpg \
     --im_or_folder /media/data/chnxi/FashionCeleb_Salient/Images \
     --output-dir $MODEL_PATH/$MODEL_NAME/visualizations/FashionCeleb_NoSoftNMS \
-    --class_list_file /media/data/chnxi/FashionV2/taxonomy/fashion_82_labels.txt \
+    --class_list_file /media/data/chnxi/FashionV3/taxonomy/fashion_furniture_visualintent_166_labels.txt \
     TEST.SOFT_NMS.ENABLED False \
     TEST.SCALE $SCALE \
 

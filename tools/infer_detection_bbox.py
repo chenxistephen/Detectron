@@ -160,7 +160,6 @@ def extend_results(index, all_res, im_res):
         all_res[cls_idx][index] = im_res[cls_idx]
 
 def main(args):
-    #datasetName = 'logo_1048_test' #'furniture_val'
     logger = logging.getLogger(__name__)
     merge_cfg_from_file(args.cfg)
     cfg.NUM_GPUS = 1
@@ -185,7 +184,7 @@ def main(args):
     if classes_list is not None:
         classes_list = ['background'] + classes_list
         
-    print (classes_list)
+    print (classes_list[:10])
     
     args.weights = cache_url(args.weights, cfg.DOWNLOAD_CACHE)
     assert_and_infer_cfg(cache_urls=False)
@@ -215,6 +214,7 @@ def main(args):
     num_images = len(im_list)
     num_classes = len(classes_list)
     all_boxes = [[[] for _ in range(num_images)] for _ in range(num_classes)]
+    print (f"Inference on {num_images} images")
     ###################################################
 
 
@@ -265,17 +265,18 @@ if __name__ == '__main__':
     workspace.GlobalInit(['caffe2', '--caffe2_log_level=0'])
     detectron.utils.logging.setup_logging(__name__)
     args = parse_args()
+    ############################################################################################################
     # For debug:
     model_dict = {'HF': {'MODEL_PATH': "Trained_Models/HomeFurniture/V1_Shipping/", "MODEL_NAME": "", 
                           "cfg": "configs/HomeFurniture/hf_fashion_vi_retinanet.yaml", 
                           "class_list": '/media/data/chnxi/HomeFurniture/taxonomy/furniture_58_labels.txt'}, 
-                 'GOD': {'MODEL_PATH':'/media/data/chnxi/GOD/Models/', 'MODEL_NAME': 'Open800k_580/frcnn_8gpuxbs2-iter_1600000-lr_0.02', 
-                         'cfg':'configs/GOD/e2e_faster_rcnn_R-50-FPN_8gpu.yaml', 
-                         'class_list': '/media/data/chnxi/GOD/taxonomy/GOD_V1.1_labels.txt'},
+                 'GOD': {'MODEL_PATH':'/media/data/chnxi/GOD/Models/', 'MODEL_NAME': 'Final_Candidate', 
+                         'cfg':'/media/data/chnxi/GOD/Models/Final_Candidate/retinanet_R-50-FPN_8gpu.yaml', 
+                         'class_list': '/media/data/chnxi/GOD/taxonomy/GODv1_May2020_579_Labels_final.txt'},
            'FashionV3': {'MODEL_PATH': "Trained_Models/FashionV3/", "MODEL_NAME": "V3_Shipping", 
                          'cfg': 'Trained_Models/FashionV3/V3_Shipping/fashion_hf_vi_167_retinanet.yaml',
                          'class_list': '/media/data/chnxi/FashionV3/taxonomy/fashion_furniture_visualintent_166_labels.txt'}}
-    modelType = 'FashionV3'
+    modelType = 'GOD'
     MODEL_PATH = model_dict[modelType]['MODEL_PATH'] 
     MODEL_NAME = model_dict[modelType]['MODEL_NAME'] 
     args.cfg = model_dict[modelType]['cfg']
@@ -287,9 +288,9 @@ if __name__ == '__main__':
     args.weights= osp.join(model_folder, 'model_final.pkl')
     args.output_dir=osp.join(output_folder, 'visualizations')
     args.pkl_file = osp.join(output_folder, 'all_boxes.pkl')
-    args.im_list = '/media/data/chnxi/CameraMeasurementSetV3/camera_set_v3_imglist.tsv'
-    args.im_or_folder='/media/data/chnxi/CameraMeasurementSetV3'
+    args.im_list = '/media/data/chnxi/GOD/IPU/imgs/imglist.txt' #'/media/data/chnxi/CameraMeasurementSetV3/camera_set_v3_imglist.tsv'
+    args.im_or_folder='/media/data/chnxi/GOD/IPU/imgs/'
     #'/media/data/chnxi/GOD/taxonomy/GOD_V1.1_labels.txt'
-    #############
+    ############################################################################################################
     print (args)
     main(args)

@@ -27,7 +27,7 @@ RETINANET:
   LOSS_ALPHA: 0.25
 TRAIN:
   WEIGHTS: https://dl.fbaipublicfiles.com/detectron/ImageNetPretrained/MSRA/R-50.pkl
-  DATASETS: ('GOD_Open40k_train', )
+  DATASETS: ('GODOpen40k_train', )
   SCALES: (600,)
   MAX_SIZE: 1000
   IMS_PER_BATCH: 2
@@ -36,6 +36,7 @@ TRAIN:
   AUTO_RESUME: True
 TEST:
   FORCE_JSON_DATASET_EVAL: True
+  NMS: 0.5
 # TEST:
 #   DATASETS: ('coco_2014_minival',)
 #   SCALE: 800

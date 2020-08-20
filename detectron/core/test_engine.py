@@ -267,95 +267,107 @@ def test_net(
     roidb, dataset, start_ind, end_ind, total_num_images = get_roidb_and_dataset(
         dataset_name, proposal_file, ind_range
     )
-    model = initialize_model_from_cfg(weights_file, gpu_id=gpu_id)
-    num_images = len(roidb)
-    num_classes = cfg.MODEL.NUM_CLASSES
-    all_boxes, all_segms, all_keyps = empty_results(num_classes, num_images)
-    timers = defaultdict(Timer)
-    for i, entry in enumerate(roidb):
-        if cfg.TEST.PRECOMPUTED_PROPOSALS:
-            # The roidb may contain ground-truth rois (for example, if the roidb
-            # comes from the training or val split). We only want to evaluate
-            # detection on the *non*-ground-truth rois. We select only the rois
-            # that have the gt_classes field set to 0, which means there's no
-            # ground truth.
-            box_proposals = entry['boxes'][entry['gt_classes'] == 0]
-            if len(box_proposals) == 0:
-                continue
-        else:
-            # Faster R-CNN type models generate proposals on-the-fly with an
-            # in-network RPN; 1-stage models don't require proposals.
-            box_proposals = None
-
-        im = cv2.imread(entry['image'])
-        #print(entry['image'])
-        with c2_utils.NamedCudaScope(gpu_id):
-            cls_boxes_i, cls_segms_i, cls_keyps_i = im_detect_all(
-                model, im, box_proposals, timers
-            )
-
-        extend_results(i, all_boxes, cls_boxes_i)
-        if cls_segms_i is not None:
-            extend_results(i, all_segms, cls_segms_i)
-        if cls_keyps_i is not None:
-            extend_results(i, all_keyps, cls_keyps_i)
-
-        if i % 10 == 0:  # Reduce log file size
-            ave_total_time = np.sum([t.average_time for t in timers.values()])
-            eta_seconds = ave_total_time * (num_images - i - 1)
-            eta = str(datetime.timedelta(seconds=int(eta_seconds)))
-            det_time = (
-                timers['im_detect_bbox'].average_time +
-                timers['im_detect_mask'].average_time +
-                timers['im_detect_keypoints'].average_time
-            )
-            misc_time = (
-                timers['misc_bbox'].average_time +
-                timers['misc_mask'].average_time +
-                timers['misc_keypoints'].average_time
-            )
-            logger.info(
-                (
-                    'im_detect: range [{:d}, {:d}] of {:d}: '
-                    '{:d}/{:d} {:.3f}s + {:.3f}s (eta: {})'
-                ).format(
-                    start_ind + 1, end_ind, total_num_images, start_ind + i + 1,
-                    start_ind + num_images, det_time, misc_time, eta
-                )
-            )
-
-        if cfg.VIS:
-            print (os.path.join(output_dir, 'vis'))
-            im_name = os.path.splitext(os.path.basename(entry['image']))[0]
-            vis_utils.vis_one_image(
-                im[:, :, ::-1],
-                '{:d}_{:s}'.format(i, im_name),
-                os.path.join(output_dir, 'vis'),
-                cls_boxes_i,
-                segms=cls_segms_i,
-                keypoints=cls_keyps_i,
-                thresh=cfg.VIS_TH,
-                box_alpha=0.8,
-                dataset=dataset,
-                show_class=True,
-                ext='png'
-            )
-
-    cfg_yaml = envu.yaml_dump(cfg)
-    if ind_range is not None:
-        det_name = 'detection_range_%s_%s.pkl' % tuple(ind_range)
-    else:
-        det_name = 'detections.pkl'
+    ################################################################
+    det_name = "detections.pkl"
     det_file = os.path.join(output_dir, det_name)
-    save_object(
-        dict(
-            all_boxes=all_boxes,
-            all_segms=all_segms,
-            all_keyps=all_keyps,
-            cfg=cfg_yaml
-        ), det_file
-    )
-    logger.info('Wrote detections to: {}'.format(os.path.abspath(det_file)))
+    print ("det_file = {}==========================".format(det_file))
+    if os.path.exists(det_file):
+        print ("{} exists! Loading detection results".format(det_file))
+        res = load_object(det_file) #pickle.load(open(det_file, 'rb'))
+        all_boxes = res['all_boxes']
+        all_segms = res['all_segms']
+        all_keyps = res['all_keyps']
+    ################################################################
+    else:
+        model = initialize_model_from_cfg(weights_file, gpu_id=gpu_id)
+        num_images = len(roidb)
+        num_classes = cfg.MODEL.NUM_CLASSES
+        all_boxes, all_segms, all_keyps = empty_results(num_classes, num_images)
+        timers = defaultdict(Timer)
+        for i, entry in enumerate(roidb):
+            if cfg.TEST.PRECOMPUTED_PROPOSALS:
+                # The roidb may contain ground-truth rois (for example, if the roidb
+                # comes from the training or val split). We only want to evaluate
+                # detection on the *non*-ground-truth rois. We select only the rois
+                # that have the gt_classes field set to 0, which means there's no
+                # ground truth.
+                box_proposals = entry['boxes'][entry['gt_classes'] == 0]
+                if len(box_proposals) == 0:
+                    continue
+            else:
+                # Faster R-CNN type models generate proposals on-the-fly with an
+                # in-network RPN; 1-stage models don't require proposals.
+                box_proposals = None
+
+            im = cv2.imread(entry['image'])
+            #print(entry['image'])
+            with c2_utils.NamedCudaScope(gpu_id):
+                cls_boxes_i, cls_segms_i, cls_keyps_i = im_detect_all(
+                    model, im, box_proposals, timers
+                )
+
+            extend_results(i, all_boxes, cls_boxes_i)
+            if cls_segms_i is not None:
+                extend_results(i, all_segms, cls_segms_i)
+            if cls_keyps_i is not None:
+                extend_results(i, all_keyps, cls_keyps_i)
+
+            if i % 10 == 0:  # Reduce log file size
+                ave_total_time = np.sum([t.average_time for t in timers.values()])
+                eta_seconds = ave_total_time * (num_images - i - 1)
+                eta = str(datetime.timedelta(seconds=int(eta_seconds)))
+                det_time = (
+                    timers['im_detect_bbox'].average_time +
+                    timers['im_detect_mask'].average_time +
+                    timers['im_detect_keypoints'].average_time
+                )
+                misc_time = (
+                    timers['misc_bbox'].average_time +
+                    timers['misc_mask'].average_time +
+                    timers['misc_keypoints'].average_time
+                )
+                logger.info(
+                    (
+                        'im_detect: range [{:d}, {:d}] of {:d}: '
+                        '{:d}/{:d} {:.3f}s + {:.3f}s (eta: {})'
+                    ).format(
+                        start_ind + 1, end_ind, total_num_images, start_ind + i + 1,
+                        start_ind + num_images, det_time, misc_time, eta
+                    )
+                )
+
+            if cfg.VIS:
+                print (os.path.join(output_dir, 'vis'))
+                im_name = os.path.splitext(os.path.basename(entry['image']))[0]
+                vis_utils.vis_one_image(
+                    im[:, :, ::-1],
+                    '{:d}_{:s}'.format(i, im_name),
+                    os.path.join(output_dir, 'vis'),
+                    cls_boxes_i,
+                    segms=cls_segms_i,
+                    keypoints=cls_keyps_i,
+                    thresh=cfg.VIS_TH,
+                    box_alpha=0.8,
+                    dataset=dataset,
+                    show_class=True,
+                    ext='png'
+                )
+
+        cfg_yaml = envu.yaml_dump(cfg)
+        if ind_range is not None:
+            det_name = 'detection_range_%s_%s.pkl' % tuple(ind_range)
+        else:
+            det_name = 'detections.pkl'
+        det_file = os.path.join(output_dir, det_name)
+        save_object(
+            dict(
+                all_boxes=all_boxes,
+                all_segms=all_segms,
+                all_keyps=all_keyps,
+                cfg=cfg_yaml
+            ), det_file
+        )
+        logger.info('Wrote detections to: {}'.format(os.path.abspath(det_file)))
     return all_boxes, all_segms, all_keyps
 
 

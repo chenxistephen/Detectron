@@ -77,7 +77,7 @@ class JsonDataset(object):
         inst_cats = [a['category_id'] for a in self.COCO.dataset['annotations']]
         C = Counter(inst_cats)
         self.category_weights = np.array([C[cid] for i, cid in enumerate(category_ids)])
-        self.category_weights = self.category_weights / len(inst_cats)
+        #self.category_weights = self.category_weights / len(inst_cats)
         ##############################################################################  
         # Stephen: add subset_categories
         if 'subset_categories' in self.COCO.dataset:

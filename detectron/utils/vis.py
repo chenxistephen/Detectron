@@ -291,12 +291,13 @@ def vis_one_image(
         sorted_inds = np.argsort(-areas)
 
     mask_color_id = 0
+    objCount = 0
     for i in sorted_inds:
         bbox = boxes[i, :4]
         score = boxes[i, -1]
         if score < thresh:
             continue
-
+        objCount += 1
         # show box (off by default)
         ax.add_patch(
             plt.Rectangle((bbox[0], bbox[1]),
@@ -397,6 +398,7 @@ def vis_one_image(
     output_name = os.path.basename(im_name) + '.' + ext
     fig.savefig(os.path.join(output_dir, '{}'.format(output_name)), dpi=dpi)
     plt.close('all')
+    print ('objCount = {}'.format(objCount))
         
     
 def diff_vis_one_image(

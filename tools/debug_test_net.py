@@ -52,7 +52,7 @@ def parse_args():
         '--cfg',
         dest='cfg_file',
         help='optional config file',
-        default="configs/FashionV3/fashion_vi_110_retinanet.yaml",
+        default=None, #"configs/FashionV3/fashion_vi_110_retinanet.yaml",
         type=str
     )
     parser.add_argument(
@@ -102,11 +102,27 @@ if __name__ == '__main__':
     logger = setup_logging(__name__)
     args = parse_args()
     ##########################################################################################################
+    # ## Debug Params
+    # args.cfg_file = "/home/chnxi/Detectron/configs/GOD/retinanet_R-50-FPN_8gpu.yaml"
+    # test_weights = "/media/data/chnxi/FashionV3/Models/Fashion_HF_VI/bs2-iter_300000-lr_0.01-alpha_0.25-gamma_2/model_final.pkl"
+    # output_dir="/media/data/chnxi/FashionV3/Models/Fashion_HF_VI/bs2-iter_300000-lr_0.01-alpha_0.25-gamma_2/Test_400_FG"
+    # args.eval_test = True
+    # args.opts = ['TEST.WEIGHTS', test_weights, 'OUTPUT_DIR', output_dir, 'VIS', True, 'VIS_TH', 0.39]
+    ##########################################################################################################
     ## Debug Params
-    test_weights = "/media/data/chnxi/FashionV3/Models/Fashion_HF_VI/bs2-iter_300000-lr_0.01-alpha_0.25-gamma_2/model_final.pkl"
-    output_dir="/media/data/chnxi/FashionV3/Models/Fashion_HF_VI/bs2-iter_300000-lr_0.01-alpha_0.25-gamma_2/Test_400_FG"
+    args.cfg_file = "/home/chnxi/Detectron/configs/GOD/retinanet_R-50-FPN_8gpu.yaml"
+    test_weights = "/media/data/chnxi/GOD/Models/Final_Candidate/model_final.pkl"
+    output_dir="/media/data/chnxi/GOD/Models/Final_Candidate/Test_400-SoftNMS-False/"
     args.eval_test = True
-    args.opts = ['TEST.WEIGHTS', test_weights, 'OUTPUT_DIR', output_dir, 'VIS', True, 'VIS_TH', 0.39]
+    args.opts = ['TEST.WEIGHTS', test_weights, 'TEST.DATASETS', "('GOD_coco_2014_minival', )", 'OUTPUT_DIR', output_dir]
+    ##########################################################################################################
+    ## Debug Params
+    # args.cfg_file = "/home/chnxi/Detectron/configs/FashionV3/fashion_hf_vi_167_retinanet.yaml"
+    # test_weights = "/media/data/chnxi/FashionV3/Models/Final_Shipping_Candidate"
+    # output_dir="/media/data/chnxi/FashionV3/Models/Final_Shipping_Candidate/Test_400-SoftNMS-False/"
+    # test_set = "bing5k_fashion"
+    # args.eval_test = True
+    # args.opts = ['TEST.WEIGHTS', test_weights, 'TEST.DATASETS', "('{}', )".format(test_set), 'OUTPUT_DIR', output_dir]
     ##########################################################################################################
     logger.info('Called with args:')
     logger.info(args)

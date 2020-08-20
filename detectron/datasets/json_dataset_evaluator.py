@@ -217,7 +217,7 @@ def _write_dict_to_tsv(d, filename, title=None):
 
 
 def _do_detection_eval(json_dataset, res_file, output_dir, 
-        computeLocPR=False, precList=[0.9, 0.85, 0.8, 0.75, 0.7]):
+        computeLocPR=False, precList=[0.9, 0.85, 0.8, 0.75, 0.7], recList=[0.5, 0.9]):
     loadtime = Timer()
     loadtime.tic()
     coco_dt = json_dataset.COCO.loadRes(str(res_file))
@@ -227,6 +227,7 @@ def _do_detection_eval(json_dataset, res_file, output_dir,
     cls_pr_file = os.path.join(output_dir, 'classwise_pr_curves.pkl')
     loc_pr_file = os.path.join(output_dir, 'localization_pr_curves.pkl')
     cls_ap_file = os.path.join(output_dir, 'classwise_ap50_{}.tsv'.format(json_dataset.name))
+    cls_inst_cnt_file = os.path.join(output_dir, '{}_cls_instances_count.tsv'.format(json_dataset.name))
     ################################################################################################
     ### Evaluate for localization precision/recall
     if computeLocPR:
@@ -246,9 +247,11 @@ def _do_detection_eval(json_dataset, res_file, output_dir,
     ################################################################################################
     coco_eval = COCOeval(json_dataset.COCO, coco_dt, 'bbox')
     coco_eval.params.useCats = 1
+    evaltime = Timer(); evaltime.tic()
     coco_eval.evaluate()
+    evaltime.toc(); logger.info('Time to COCOeval: {:.3f}s'.format(evaltime.average_time))
     coco_eval.accumulate()
-    clsPRs = _log_detection_eval_metrics(json_dataset, coco_eval, precList=precList)
+    clsPRs = _log_detection_eval_metrics(json_dataset, coco_eval, precList=precList, recList=recList)
     clsAP50Dict = clsPRs['clsAP50Dict']
     #clsWAP50Dict = clsPRs['clsWAP50Dict']
 
@@ -256,9 +259,12 @@ def _do_detection_eval(json_dataset, res_file, output_dir,
     save_object(clsPRs, cls_pr_file)
     allAPs = np.array([clsAP50Dict[c] for c in json_dataset.classes[1:]])
     #allWAPs = np.array([clsWAP50Dict[c] for c in json_dataset.classes[1:]])
-    allWAPs = np.array([ap50 * json_dataset.category_weights[i] for i, ap50 in enumerate(allAPs)])
+    total_inst_num = np.sum(json_dataset.category_weights)
+    allWAPs = np.array([ap50 * json_dataset.category_weights[i] / total_inst_num  for i, ap50 in enumerate(allAPs)])
     ap_all = np.mean(allAPs[allAPs > -1])
     wap_all = np.sum(allWAPs[allWAPs> -1])
+    dataset_inst_count_dict = dict(zip(json_dataset.classes[1:], json_dataset.category_weights))
+    _write_dict_to_tsv(dataset_inst_count_dict, cls_inst_cnt_file, '{} category instance count\n'.format(json_dataset.name))
     ################################################################################################
     #print ("P@{} Score = {}, real precision = {}".format(0.9, score_p_at_thrsh, p_at_thrsh))
     clsThrshAtP90 = clsPRs['cls_thrsh_at_prec'][0.9]
@@ -401,7 +407,7 @@ def _log_localization_eval_metrics(coco_eval, fgclass='foreground', precList = [
     ########################################################################
 
 
-def _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.8, 0.75, 0.7], recList=[0.5]):
+def _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.8, 0.75, 0.7], recList=[0.5, 0.9]):
     def _get_thr_ind(coco_eval, thr):
         ind = np.where((coco_eval.params.iouThrs > thr - 1e-5) &
                        (coco_eval.params.iouThrs < thr + 1e-5))[0][0]
@@ -422,6 +428,7 @@ def _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.
     ### Logging classwise PR curves
     recallThrs = coco_eval.params.recThrs
     clsPrecisions = []
+    clsScores = []
     clsAPs = []
     clsAP50 = []
     clsAPDict = {}
@@ -467,6 +474,7 @@ def _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.
         cls_scores = coco_eval.eval['scores'][
             ind_lo, :, cls_ind - 1, 0, 2]
         clsPrecisions.append(cls_precision)
+        clsScores.append(cls_scores)
         ap50 = np.mean(cls_precision[cls_precision > -1])
         ########################################################################
         # Compute scores at precision/recall
@@ -500,6 +508,7 @@ def _log_detection_eval_metrics(json_dataset, coco_eval, precList=[0.9, 0.85, 0.
     clsPrecisions = np.stack(clsPrecisions, axis=0)
     clsPRs = {'recallThrs':recallThrs, 
               'clsPrecisions':clsPrecisions,
+              'clsScores': clsScores,
               'clsAPs': clsAPs,
               'clsAP50': clsAP50,
               'clsAPDict':clsAPDict, 

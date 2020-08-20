@@ -59,8 +59,9 @@ def parse_args():
         '--wait',
         dest='wait',
         help='wait until net file exists',
-        default=True,
-        type=bool
+        action='store_true'
+        #default=True,
+        #type=bool
     )
     parser.add_argument(
         '--vis', dest='vis', help='visualize detections', action='store_true'
@@ -110,7 +111,7 @@ if __name__ == '__main__':
     assert_and_infer_cfg()
     logger.info('Testing with config:')
     logger.info(pprint.pformat(cfg))
-
+    print ("args.wait= {}".format(args.wait))
     while not os.path.exists(cfg.TEST.WEIGHTS) and args.wait:
         logger.info('Waiting for \'{}\' to exist...'.format(cfg.TEST.WEIGHTS))
         time.sleep(10)

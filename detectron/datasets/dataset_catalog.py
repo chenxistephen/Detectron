@@ -191,6 +191,12 @@ _DATASETS = {
         _ANN_FN:
             _DATA_DIR + '/HomeFurniture/json_annotations/train_annotations.json'
     },
+    'HFval_and_Bing5kHF': {
+        _IM_DIR:
+            _DATA_DIR,
+        _ANN_FN:
+            _DATA_DIR + '/HomeFurniture/json_annotations/HFVal_and_Bing5kHF_annotations.json'
+    },
     'furniture_val': {
         _IM_DIR:
             _DATA_DIR + '/HomeFurniture/Images',
@@ -210,6 +216,12 @@ _DATASETS = {
             _DATA_DIR + '/HomeFurniture/json_annotations/val_SearchIntent_annotations.json'
     },
     'bing5k_GOD': {
+        _IM_DIR:
+            _DATA_DIR + '/BingMeasurement_5k/Images',
+        _ANN_FN:
+            _DATA_DIR + '/BingMeasurement_5k/json_annotations/GOD_V1_annotations.json'
+    },
+    'bing5k_GOD_NA': {
         _IM_DIR:
             _DATA_DIR + '/BingMeasurement_5k/Images',
         _ANN_FN:

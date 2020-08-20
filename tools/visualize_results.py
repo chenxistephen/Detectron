@@ -111,7 +111,11 @@ def vis(dataset, detections_pkl, thresh, output_dir, sampleNum=None, class_list_
     #classes_list = [l.rstrip() for l in open('/home/chnxi/data/HomeFurniture/taxonomy/furniture_58_labels.txt','r').readlines()]
     #classes_list = [l.rstrip().split('\t')[0].split('\\')[-1] for l in open(class_list_file,'r').readlines()]
     if class_list_file is not None:
-        classes_list = [l.rstrip().split('\t')[1].split('/')[-1] for l in open(class_list_file,'r').readlines()[1:]]
+        lines = open(class_list_file,'r').readlines()
+        if len(lines[0].split('\t')) == 2: # god_id \t god_name
+            classes_list = [l.rstrip().split('\t')[1].split('/')[-1] for l in lines[1:]]
+        elif len(lines[0].split('\t')) == 1:
+            classes_list = [l.rstrip().split('\t')[0].split('/')[-1] for l in lines]
     else:
         classes_list = ds.classes
     classes_list = ['background'] + classes_list

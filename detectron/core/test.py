@@ -55,6 +55,9 @@ def im_detect_all(model, im, box_proposals, timers=None):
 
     # Handle RetinaNet testing separately for now
     if cfg.RETINANET.RETINANET_ON:
+        #################################### DEBUG ####################################
+        ## import detectron.core.debug_test_retinanet as test_retinanet
+        #################################### DEBUG ####################################
         cls_boxes = test_retinanet.im_detect_bbox(model, im, timers)
         return cls_boxes, None, None
 
